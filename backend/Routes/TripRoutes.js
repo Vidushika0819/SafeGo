@@ -4,7 +4,7 @@ const router = express.Router();
 
 // Import Trip Controller (only once)
 const { getAllTrips, addTrips, getById, updateTripById, deleteTripById} = require("../Controllers/TripController.js");
-const { findByIdAndDelete } = require("../Model/TripModel.js");
+const { findByIdAndDelete } = require("../Models/TripModel.js");
 
 // Get all Trips
 router.get("/", getAllTrips);
@@ -23,4 +23,3 @@ router.delete("/:id", deleteTripById);
 
 //export
 module.exports = router;
-

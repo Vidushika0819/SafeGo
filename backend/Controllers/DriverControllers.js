@@ -1,4 +1,4 @@
-const Driver = require('../Model/DriverModel');
+const Driver = require('../Models/DriverModel');
 
 //data display
 const getAllDrivers = async (req, res, next) => {
@@ -73,6 +73,20 @@ const getById = async (req, res, next) => {
         res.status(500).json({ message: error.message });
     }}  ;
 
+//get driver by email
+
+const getByEmail = async (req, res, next) => {
+
+    try {
+        const driver = await Driver.findOne({ email: req.params.email });
+        if (!driver) {
+            return res.status(404).json({ message: 'Driver not found' });
+        }
+        res.status(200).json({ driver });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }}  ;
+
 //update driver details
 const updateDriver = async (req, res, next) => {
     const { name, licenseNumber, phoneNumber, vehicleType, vehicleNumber, age, experienceYears, email, address, password } = req.body;
@@ -131,4 +145,4 @@ const deleteDriver = async (req, res, next) => {
 
 
 
-module.exports = { getAllDrivers , addDrivers , getById , updateDriver, deleteDriver } ;
+module.exports = { getAllDrivers , addDrivers , getById , getByEmail , updateDriver, deleteDriver } ;

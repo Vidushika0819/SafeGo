@@ -1,0 +1,885 @@
+/* Trip Assignments Management Styles */
+
+.trip-assignments-management {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.page-header {
+  background: white;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.breadcrumb {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.breadcrumb span:not(:last-child)::after {
+  content: ' › ';
+  margin: 0 0.25rem;
+}
+
+.page-title h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.page-title p {
+  margin: 0.5rem 0 0 0;
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.page-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+}
+
+.quick-stats-sidebar {
+  width: 300px;
+  background: white;
+  padding: 2rem;
+  border-left: 1px solid #e9ecef;
+  box-shadow: -2px 0 4px rgba(0,0,0,0.1);
+}
+
+.stats-card, .action-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.stats-card h4, .action-card h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #007bff;
+  margin-bottom: 0.5rem;
+}
+
+.stats-card p, .action-card p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn.primary {
+  background: #007bff;
+  color: white;
+}
+
+.action-btn.primary:hover {
+  background: #0056b3;
+}
+
+.action-btn.secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.action-btn.secondary:hover {
+  background: #545b62;
+}
+
+/* View Containers */
+.view-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.view-header {
+  background: #f8f9fa;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.back-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #545b62;
+}
+
+.view-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.primary-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.primary-btn:hover {
+  background: #0056b3;
+}
+
+.view-content {
+  padding: 2rem;
+}
+
+/* Loading States */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Trip Assignment List Styles */
+.trip-assignments-container {
+  max-width: 100%;
+}
+
+.assignments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.assignments-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.stats-summary {
+  display: flex;
+  gap: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-item .stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #007bff;
+}
+
+.stat-item .stat-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+.assignments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.assignment-card {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.assignment-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-color: #007bff;
+}
+
+.assignment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.child-info h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.child-grade, .child-school {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.assignment-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-badge, .type-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active { background: #d4edda; color: #155724; }
+.status-inactive { background: #fff3cd; color: #856404; }
+.status-canceled { background: #f8d7da; color: #721c24; }
+.status-completed { background: #d1ecf1; color: #0c5460; }
+
+.type-pickup { background: #cce5ff; color: #004085; }
+.type-dropoff { background: #d1ecf1; color: #0c5460; }
+.type-both { background: #d4edda; color: #155724; }
+
+.trip-info {
+  margin-bottom: 1rem;
+}
+
+.trip-details p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #495057;
+}
+
+.trip-details strong {
+  color: #343a40;
+}
+
+.assignment-meta {
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.assignment-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn, .cancel-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background: #007bff;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #0056b3;
+}
+
+.cancel-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #c82333;
+}
+
+/* Empty State */
+.no-assignments {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.empty-state .empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: #6c757d;
+}
+
+.empty-state p {
+  margin: 0.5rem 0;
+  color: #6c757d;
+}
+
+/* Trip Selector Styles */
+.trip-selector-container {
+  max-width: 100%;
+}
+
+.selector-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.selector-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.school-info {
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.trips-list h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.trips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.trip-card {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.trip-card:hover {
+  border-color: #007bff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.trip-card.selected {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.trip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.trip-id {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.capacity-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.capacity-full { background: #f8d7da; color: #721c24; }
+.capacity-limited { background: #fff3cd; color: #856404; }
+.capacity-available { background: #d4edda; color: #155724; }
+
+.trip-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.value {
+  color: #6c757d;
+}
+
+.selection-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #007bff;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Assignment Options */
+.assignment-options {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.assignment-options h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.assignment-type-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.type-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.type-option:hover {
+  border-color: #007bff;
+}
+
+.type-option input[type="radio"] {
+  margin-top: 0.25rem;
+}
+
+.type-label {
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 0.25rem;
+}
+
+.type-description {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Selector Actions */
+.selector-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.confirm-btn, .cancel-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirm-btn {
+  background: #007bff;
+  color: white;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.confirm-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #545b62;
+}
+
+/* Assignment Form Styles */
+.assignment-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.form-header p {
+  margin: 0;
+  color: #6c757d;
+}
+
+.assignment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #343a40;
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group input[type="tel"],
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+.form-group.error input,
+.form-group.error select,
+.form-group.error textarea {
+  border-color: #dc3545;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.char-count {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+/* Assignment Type Options */
+.assignment-type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+}
+
+.option input[type="radio"] {
+  margin-top: 0.25rem;
+}
+
+.option-label {
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 0.25rem;
+}
+
+.option-desc {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Emergency Contact Section */
+.emergency-contact-section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.section-desc {
+  margin-bottom: 1rem;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.emergency-contact-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.submit-btn, .cancel-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-btn {
+  background: #007bff;
+  color: white;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.submit-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #545b62;
+}
+
+/* Child Selection */
+.child-selection {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.child-selection h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.children-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.child-card {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.child-card:hover {
+  border-color: #007bff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.child-card.selected {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.child-avatar {
+  width: 50px;
+  height: 50px;
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+.child-info h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.child-info p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.next-step {
+  text-align: center;
+}
+
+.next-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.next-btn:hover {
+  background: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .trip-assignments-management {
+    flex-direction: column;
+  }
+
+  .quick-stats-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+
+  .assignments-grid,
+  .trips-grid,
+  .children-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-summary {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .assignment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions,
+  .selector-actions {
+    flex-direction: column;
+  }
+
+  .assignment-actions {
+    flex-direction: column;
+  }
+}

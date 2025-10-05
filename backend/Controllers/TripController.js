@@ -1,9 +1,12 @@
-const Trip = require("../Model/TripModel");
+const Trip = require("../Models/TripModel");
 
 //display all Trips
 const getAllTrips = async (req, res, next) => {
   try {
-    const trips = await Trip.find();
+    const trips = await Trip.find()
+      .populate('busId')
+      .populate('driverId')
+      .populate('coordinatorId');
 
     if (!trips) {
       return res.status(404).json({ message: "No Trips found" });
@@ -17,7 +20,7 @@ const getAllTrips = async (req, res, next) => {
 
 //data insert
 const addTrips = async (req, res, next) => {
-  const { Trip_ID, date, start_time, end_time, start_location, route, status } =
+  const { Trip_ID, date, start_time, end_time, start_location, route, status, busId, driverId, coordinatorId } =
     req.body;
 
   try {
@@ -29,6 +32,9 @@ const addTrips = async (req, res, next) => {
       start_location,
       route,
       status,
+      busId,
+      driverId,
+      coordinatorId,
     });
     await newTrip.save();
     return res.status(201).json(newTrip);
@@ -53,7 +59,10 @@ const getById = async (req, res, next) => {
   const id = req.params.id;
 
   try {
-    const trip = await Trip.findById(id);
+    const trip = await Trip.findById(id)
+      .populate('busId')
+      .populate('driverId')
+      .populate('coordinatorId');
     if (!trip) {
       return res.status(404).json({ message: "Trip not found" });
     }
@@ -68,12 +77,12 @@ const getById = async (req, res, next) => {
 //update trip by ID
 const updateTripById = async (req, res, next) => {
   const id = req.params.id;
-  const { Trip_ID, date, start_time, end_time, start_location, route, status } = req.body;
+  const { Trip_ID, date, start_time, end_time, start_location, route, status, busId, driverId, coordinatorId } = req.body;
 
   try {
     const trip = await Trip.findByIdAndUpdate(
       id,
-      { Trip_ID, date, start_time, end_time, start_location, route, status },
+      { Trip_ID, date, start_time, end_time, start_location, route, status, busId, driverId, coordinatorId },
       { new: true }
     );
 
