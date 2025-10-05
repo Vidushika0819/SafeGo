@@ -1,11 +1,27 @@
-import SeatMap from "./components/SeatMap";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import SeatReservationPage from "./pages/SeatReservationPage";
+import FeeSummaryPage from "./pages/FeeSummaryPage";
+import PaymentGateway from "./pages/PaymentGateway";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import StudentLogin from "./components/StudentLogin";
+import StudentWaitlistPage from "./pages/StudentWaitlistPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>SafeGo - Bus Seat Reservation</h1>
-      <SeatMap />
-    </div>
+    <Router>
+      <div style={{ fontFamily: "Arial", padding: "20px" }}>
+        <Routes>
+          <Route path="/" element={<StudentLogin />} />
+          <Route path="/seat-reservation" element={<SeatReservationPage />} />
+          <Route path="/fee-summary" element={<FeeSummaryPage />} />
+          <Route path="/payment" element={<PaymentGateway />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/waitlist" element={<StudentWaitlistPage />} />
+        </Routes>
+        <Toaster position="top-right" />
+      </div>
+    </Router>
   );
 }
 
