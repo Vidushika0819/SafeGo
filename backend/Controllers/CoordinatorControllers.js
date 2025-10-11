@@ -12,8 +12,20 @@ const getAllCoordinators = async (req, res, next) => {
         return res.status(404).json({message:"No Coordinators found"});
     }
 
+    // Ensure all coordinators have proper display names
+    const coordinatorsWithNames = coordinators.map(coordinator => {
+        const coordinatorObj = coordinator.toObject();
+
+        // Ensure fullName exists, fallback to email or coordinatorId
+        if (!coordinatorObj.fullName || coordinatorObj.fullName.trim() === '') {
+            coordinatorObj.fullName = coordinatorObj.email || `Coordinator ${coordinatorObj.coordinatorId}`;
+        }
+
+        return coordinatorObj;
+    });
+
     //display all coordinators
-    return res.status(200).json({coordinators});
+    return res.status(200).json({coordinators: coordinatorsWithNames});
 
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -24,11 +36,16 @@ const getAllCoordinators = async (req, res, next) => {
 const addCoordinators = async (req, res, next) => {
     const { coordinatorId, fullName, phoneNumber, DOB, email, address, password } = req.body;
 
+    // Ensure fullName is provided and not empty
+    let coordinatorFullName = fullName;
+    if (!coordinatorFullName || coordinatorFullName.trim() === '') {
+        coordinatorFullName = email || `Coordinator ${coordinatorId}`;
+    }
 
     try {
         const coordinator = new Coordinator({
             coordinatorId,
-            fullName,
+            fullName: coordinatorFullName,
             phoneNumber,
             DOB,
             email,

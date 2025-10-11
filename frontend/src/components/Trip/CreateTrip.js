@@ -187,11 +187,19 @@ function CreateTrip() {
             onChange={handleChange}
             value={inputs.coordinatorId} required>
             <option value="">Select a Coordinator</option>
-            {coordinators.map((coordinator) => (
-              <option key={coordinator._id} value={coordinator._id}>
-                {coordinator.fullName} - {coordinator.coordinatorId}
-              </option>
-            ))}
+            {coordinators.map((coordinator) => {
+              // Ensure coordinator has a display name
+              const displayName = coordinator.fullName ||
+                coordinator.email ||
+                `Coordinator ${coordinator.coordinatorId}` ||
+                'Unknown Coordinator';
+
+              return (
+                <option key={coordinator._id} value={coordinator._id}>
+                  {displayName} - {coordinator.coordinatorId}
+                </option>
+              );
+            })}
           </select>
         </div>
 

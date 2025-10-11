@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSearchParams } from 'react-router-dom';
 import AdminStats from './AdminStats';
-import QuickActions from './QuickActions';
 import UserManagement from './UserManagement/UserManagement';
 import TripManagement from './TripManagement/TripManagement';
 import BusManagement from './BusManagement/BusManagement';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { isAdmin, logout, getUserDisplayName } = useAuth();
   const [searchParams] = useSearchParams();
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [currentView, setCurrentView] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     // Verify admin role on component mount
@@ -25,12 +26,17 @@ const AdminDashboard = () => {
     // Check URL parameters for initial section
     const section = searchParams.get('section');
     if (section && ['dashboard', 'users', 'trips', 'buses', 'reports'].includes(section)) {
-      setCurrentView(section);
+      setActiveTab(section);
     }
   }, [isAdmin, searchParams]);
 
-  const handleNavigation = (view) => {
-    setCurrentView(view);
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+    setIsDropdownOpen(false);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleLogout = () => {
@@ -39,270 +45,464 @@ const AdminDashboard = () => {
 
   if (!isAuthorized) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        fontSize: '18px'
-      }}>
-        Verifying admin access...
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Verifying admin access...</p>
       </div>
     );
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f8f9fa'
-    }}>
-      {/* Header */}
-      <header style={{
-        backgroundColor: '#343a40',
-        color: 'white',
-        padding: '1rem 2rem',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          maxWidth: '1200px',
-          margin: '0 auto'
-        }}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.5rem' }}>SafeGo Admin Dashboard</h1>
-            <p style={{ margin: '0.25rem 0 0 0', opacity: 0.8 }}>
-              Welcome, {getUserDisplayName()}
-            </p>
+    <div className="admin-dashboard">
+      {/* Modern Navbar */}
+      <nav className="dashboard-navbar">
+        <div className="nav-container">
+          <div className="nav-brand">
+            <h2>🛠️ SafeGo Admin</h2>
           </div>
-          <button
-            onClick={handleLogout}
-            style={{
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              padding: '0.5rem 1rem',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.9rem'
-            }}
-          >
-            Logout
-          </button>
+
+          <div className="nav-menu">
+            <button
+              className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => handleTabChange('dashboard')}
+            >
+              <span className="tab-icon">📊</span>
+              <span className="tab-text">Dashboard</span>
+            </button>
+
+            <button
+              className={`nav-tab ${activeTab === 'users' ? 'active' : ''}`}
+              onClick={() => handleTabChange('users')}
+            >
+              <span className="tab-icon">👥</span>
+              <span className="tab-text">Users</span>
+            </button>
+
+            <button
+              className={`nav-tab ${activeTab === 'trips' ? 'active' : ''}`}
+              onClick={() => handleTabChange('trips')}
+            >
+              <span className="tab-icon">🚌</span>
+              <span className="tab-text">Trips</span>
+            </button>
+
+            <button
+              className={`nav-tab ${activeTab === 'buses' ? 'active' : ''}`}
+              onClick={() => handleTabChange('buses')}
+            >
+              <span className="tab-icon">🚐</span>
+              <span className="tab-text">Buses</span>
+            </button>
+
+            <button
+              className={`nav-tab ${activeTab === 'reports' ? 'active' : ''}`}
+              onClick={() => handleTabChange('reports')}
+            >
+              <span className="tab-icon">📈</span>
+              <span className="tab-text">Reports</span>
+            </button>
+
+            {/* Dropdown Menu */}
+            <div className="dropdown-container">
+              <button
+                className="dropdown-toggle"
+                onClick={toggleDropdown}
+              >
+                <span className="tab-icon">⚙️</span>
+                <span className="tab-text">More</span>
+                <span className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`}>▼</span>
+              </button>
+
+              {isDropdownOpen && (
+                <div className="dropdown-menu">
+                  <button
+                    className="dropdown-item"
+                    onClick={() => handleTabChange('settings')}
+                  >
+                    🔧 System Settings
+                  </button>
+                  <button
+                    className="dropdown-item"
+                    onClick={() => handleTabChange('logs')}
+                  >
+                    📋 Activity Logs
+                  </button>
+                  <button
+                    className="dropdown-item"
+                    onClick={() => handleTabChange('backup')}
+                  >
+                    💾 Backup & Restore
+                  </button>
+                  <div className="dropdown-divider"></div>
+                  <button
+                    className="dropdown-item logout"
+                    onClick={handleLogout}
+                  >
+                    🚪 Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Main Content */}
-      <main style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '2rem'
-      }}>
-        {/* Navigation Sidebar */}
-        <aside style={{
-          float: 'left',
-          width: '250px',
-          marginRight: '2rem',
-          marginBottom: '2rem'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            padding: '1.5rem'
-          }}>
-            <h3 style={{ marginTop: 0, color: '#343a40' }}>Management Sections</h3>
-            <nav>
-              <ul style={{
-                listStyle: 'none',
-                padding: 0,
-                margin: 0
-              }}>
-                <li style={{ marginBottom: '0.5rem' }}>
-                  <button
-                    onClick={() => handleNavigation('dashboard')}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      padding: '0.75rem',
-                      backgroundColor: currentView === 'dashboard' ? '#0056b3' : '#007bff',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontWeight: currentView === 'dashboard' ? 'bold' : 'normal',
-                      textAlign: 'left'
-                    }}
-                  >
-                    📊 Dashboard Overview
-                  </button>
-                </li>
-                <li style={{ marginBottom: '0.5rem' }}>
-                  <button
-                    onClick={() => handleNavigation('users')}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      padding: '0.75rem',
-                      backgroundColor: currentView === 'users' ? '#1e7e34' : '#28a745',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontWeight: currentView === 'users' ? 'bold' : 'normal',
-                      textAlign: 'left'
-                    }}
-                  >
-                    👥 User Management
-                  </button>
-                </li>
-                <li style={{ marginBottom: '0.5rem' }}>
-                  <button
-                    onClick={() => handleNavigation('trips')}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      padding: '0.75rem',
-                      backgroundColor: currentView === 'trips' ? '#117a8b' : '#17a2b8',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontWeight: currentView === 'trips' ? 'bold' : 'normal',
-                      textAlign: 'left'
-                    }}
-                  >
-                    🚌 Trip Management
-                  </button>
-                </li>
-                <li style={{ marginBottom: '0.5rem' }}>
-                  <button
-                    onClick={() => handleNavigation('buses')}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      padding: '0.75rem',
-                      backgroundColor: currentView === 'buses' ? '#d39e00' : '#ffc107',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontWeight: currentView === 'buses' ? 'bold' : 'normal',
-                      textAlign: 'left'
-                    }}
-                  >
-                    🚐 Bus Management
-                  </button>
-                </li>
-                <li style={{ marginBottom: '0.5rem' }}>
-                  <button
-                    onClick={() => handleNavigation('reports')}
-                    style={{
-                      display: 'block',
-                      width: '100% ',
-                      padding: '0.75rem',
-                      backgroundColor: currentView === 'reports' ? '#545b62' : '#6c757d',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontWeight: currentView === 'reports' ? 'bold' : 'normal',
-                      textAlign: 'left'
-                    }}
-                  >
-                    📈 System Reports
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </aside>
+      {/* Tab Content Container */}
+      <div className="tab-content-container">
+        {/* Dashboard Tab */}
+        {activeTab === 'dashboard' && (
+          <div className="tab-content dashboard-tab">
+            <div className="welcome-section">
+              <h1>Welcome back, {getUserDisplayName()}! 👋</h1>
+              <p>Here's your complete system administration overview</p>
+            </div>
 
-        {/* Main Dashboard Content */}
-        <section style={{
-          marginLeft: '250px',
-          paddingLeft: '2rem',
-          width: '100%'
-        }}>
-          {currentView === 'dashboard' && (
-            <>
-              {/* Statistics Section */}
-              <div style={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                padding: '1.5rem',
-                marginBottom: '2rem'
-              }}>
-                <h2 style={{ marginTop: 0, color: '#343a40' }}>System Overview</h2>
-                <AdminStats />
-              </div>
-
-              {/* Quick Actions Section */}
-              <div style={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                padding: '1.5rem',
-                marginBottom: '2rem'
-              }}>
-                <h2 style={{ marginTop: 0, color: '#343a40' }}>Quick Actions</h2>
-                <QuickActions />
-              </div>
-
-              {/* Recent Activity Section */}
-              <div style={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                padding: '1.5rem'
-              }}>
-                <h2 style={{ marginTop: 0, color: '#343a40' }}>Recent Activity</h2>
-                <div style={{
-                  backgroundColor: '#f8f9fa',
-                  padding: '1rem',
-                  borderRadius: '4px',
-                  textAlign: 'center',
-                  color: '#6c757d'
-                }}>
-                  Recent system activity will be displayed here
+            {/* Stats Cards */}
+            <div className="stats-grid">
+              <div className="stat-card primary">
+                <div className="stat-icon">👥</div>
+                <div className="stat-content">
+                  <h3>247</h3>
+                  <p>Total Users</p>
                 </div>
               </div>
-            </>
-          )}
 
-          {currentView === 'users' && (
-            <UserManagement />
-          )}
+              <div className="stat-card success">
+                <div className="stat-icon">🚌</div>
+                <div className="stat-content">
+                  <h3>89</h3>
+                  <p>Active Trips</p>
+                </div>
+              </div>
 
-          {currentView === 'trips' && (
-            <TripManagement />
-          )}
+              <div className="stat-card warning">
+                <div className="stat-icon">🚐</div>
+                <div className="stat-content">
+                  <h3>34</h3>
+                  <p>Total Buses</p>
+                </div>
+              </div>
 
-          {currentView === 'buses' && (
-            <BusManagement />
-          )}
-
-          {currentView === 'reports' && (
-            <div style={{
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              padding: '3rem',
-              textAlign: 'center',
-              color: '#6c757d'
-            }}>
-              <div style={{ fontSize: '4rem', marginBottom: '20px' }}>📈</div>
-              <h2>System Reports</h2>
-              <p>Reporting system will be implemented in a future story.</p>
+              <div className="stat-card info">
+                <div className="stat-icon">📈</div>
+                <div className="stat-content">
+                  <h3>94%</h3>
+                  <p>On-Time Rate</p>
+                </div>
+              </div>
             </div>
-          )}
-        </section>
 
-        {/* Clear floats */}
-        <div style={{ clear: 'both' }}></div>
-      </main>
+            {/* System Overview */}
+            <div className="system-overview-section">
+              <h2>System Overview</h2>
+              <AdminStats />
+            </div>
+
+            {/* Quick Actions */}
+            <div className="quick-actions-section">
+              <h2>Quick Actions</h2>
+              <div className="actions-grid">
+                <button className="action-card" onClick={() => handleTabChange('users')}>
+                  <div className="action-icon">➕</div>
+                  <h3>Add User</h3>
+                  <p>Create new system users</p>
+                </button>
+
+                <button className="action-card" onClick={() => handleTabChange('trips')}>
+                  <div className="action-icon">🚌</div>
+                  <h3>Manage Trips</h3>
+                  <p>View and modify trip schedules</p>
+                </button>
+
+                <button className="action-card" onClick={() => handleTabChange('buses')}>
+                  <div className="action-icon">🚐</div>
+                  <h3>Bus Fleet</h3>
+                  <p>Monitor and maintain buses</p>
+                </button>
+
+                <button className="action-card" onClick={() => handleTabChange('reports')}>
+                  <div className="action-icon">📊</div>
+                  <h3>Generate Reports</h3>
+                  <p>View system analytics</p>
+                </button>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="recent-activity-section">
+              <h2>Recent System Activity</h2>
+              <div className="activity-list">
+                <div className="activity-item">
+                  <div className="activity-icon">👤</div>
+                  <div className="activity-content">
+                    <p><strong>New coordinator</strong> registered: Sarah Johnson</p>
+                    <span className="activity-time">5 minutes ago</span>
+                  </div>
+                </div>
+                <div className="activity-item">
+                  <div className="activity-icon">🚌</div>
+                  <div className="activity-content">
+                    <p><strong>Trip #1456</strong> completed successfully</p>
+                    <span className="activity-time">12 minutes ago</span>
+                  </div>
+                </div>
+                <div className="activity-item">
+                  <div className="activity-icon">🚐</div>
+                  <div className="activity-content">
+                    <p><strong>Bus maintenance</strong> scheduled for Bus #23</p>
+                    <span className="activity-time">1 hour ago</span>
+                  </div>
+                </div>
+                <div className="activity-item">
+                  <div className="activity-icon">📊</div>
+                  <div className="activity-content">
+                    <p><strong>Weekly report</strong> generated automatically</p>
+                    <span className="activity-time">2 hours ago</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 'users' && (
+          <div className="tab-content users-tab">
+            <div className="tab-header">
+              <h1>User Management</h1>
+              <button className="btn-primary">+ Add New User</button>
+            </div>
+
+            <UserManagement />
+          </div>
+        )}
+
+        {/* Trips Tab */}
+        {activeTab === 'trips' && (
+          <div className="tab-content trips-tab">
+            <div className="tab-header">
+              <h1>Trip Management</h1>
+              <button className="btn-primary">+ Create New Trip</button>
+            </div>
+
+            <TripManagement />
+          </div>
+        )}
+
+        {/* Buses Tab */}
+        {activeTab === 'buses' && (
+          <div className="tab-content buses-tab">
+            <div className="tab-header">
+              <h1>Bus Fleet Management</h1>
+              <button className="btn-primary">+ Add New Bus</button>
+            </div>
+
+            <BusManagement />
+          </div>
+        )}
+
+        {/* Reports Tab */}
+        {activeTab === 'reports' && (
+          <div className="tab-content reports-tab">
+            <div className="tab-header">
+              <h1>System Reports & Analytics</h1>
+              <button className="btn-secondary">📥 Export All Reports</button>
+            </div>
+
+            <div className="reports-overview">
+              <div className="overview-cards">
+                <div className="overview-card">
+                  <h3>This Month</h3>
+                  <p className="overview-number">1,247</p>
+                  <span className="overview-label">Trips Completed</span>
+                </div>
+                <div className="overview-card">
+                  <h3>Average Rating</h3>
+                  <p className="overview-number">4.8</p>
+                  <span className="overview-label">Out of 5 stars</span>
+                </div>
+                <div className="overview-card">
+                  <h3>System Uptime</h3>
+                  <p className="overview-number">99.9%</p>
+                  <span className="overview-label">Last 30 days</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="reports-charts">
+              <h2>Performance Analytics</h2>
+              <div className="chart-placeholder">
+                <div className="chart-icon">📊</div>
+                <p>Detailed analytics and interactive charts will be displayed here</p>
+                <p>Showing trip performance, user activity, and system metrics</p>
+              </div>
+            </div>
+
+            <div className="reports-sections">
+              <div className="report-section">
+                <h3>📈 Trip Performance Reports</h3>
+                <p>View detailed trip completion rates, delays, and passenger satisfaction</p>
+                <button className="btn-secondary">Generate Report</button>
+              </div>
+
+              <div className="report-section">
+                <h3>👥 User Activity Reports</h3>
+                <p>Monitor user registrations, login patterns, and system usage</p>
+                <button className="btn-secondary">Generate Report</button>
+              </div>
+
+              <div className="report-section">
+                <h3>🚐 Fleet Utilization Reports</h3>
+                <p>Track bus usage, maintenance schedules, and operational efficiency</p>
+                <button className="btn-secondary">Generate Report</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && (
+          <div className="tab-content settings-tab">
+            <div className="tab-header">
+              <h1>System Settings</h1>
+            </div>
+
+            <div className="settings-section">
+              <h2>General Settings</h2>
+              <div className="setting-item">
+                <label className="setting-label">
+                  <input type="checkbox" defaultChecked />
+                  Enable automatic backups
+                </label>
+              </div>
+              <div className="setting-item">
+                <label className="setting-label">
+                  <input type="checkbox" defaultChecked />
+                  Send system notifications
+                </label>
+              </div>
+              <div className="setting-item">
+                <label className="setting-label">
+                  <input type="checkbox" />
+                  Maintenance mode (blocks user access)
+                </label>
+              </div>
+            </div>
+
+            <div className="settings-section">
+              <h2>Security Settings</h2>
+              <div className="setting-item">
+                <label className="setting-label">
+                  <input type="checkbox" defaultChecked />
+                  Require strong passwords
+                </label>
+              </div>
+              <div className="setting-item">
+                <label className="setting-label">
+                  <input type="checkbox" defaultChecked />
+                  Enable two-factor authentication
+                </label>
+              </div>
+              <div className="setting-item">
+                <label className="setting-label">
+                  Session timeout: <input type="number" defaultValue="30" style={{width: '60px', marginLeft: '10px'}} /> minutes
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Logs Tab */}
+        {activeTab === 'logs' && (
+          <div className="tab-content logs-tab">
+            <div className="tab-header">
+              <h1>System Activity Logs</h1>
+              <button className="btn-secondary">📥 Export Logs</button>
+            </div>
+
+            <div className="logs-container">
+              <div className="log-filters">
+                <select className="filter-select">
+                  <option>All Activities</option>
+                  <option>User Actions</option>
+                  <option>System Events</option>
+                  <option>Security Events</option>
+                  <option>Errors</option>
+                </select>
+                <input type="date" className="date-filter" />
+                <button className="btn-secondary">Filter</button>
+              </div>
+
+              <div className="logs-list">
+                <div className="log-entry">
+                  <div className="log-time">2025-10-11 10:45:23</div>
+                  <div className="log-type info">INFO</div>
+                  <div className="log-message">User 'admin@safego.com' logged in</div>
+                </div>
+                <div className="log-entry">
+                  <div className="log-time">2025-10-11 10:42:15</div>
+                  <div className="log-type success">SUCCESS</div>
+                  <div className="log-message">Trip #1456 completed successfully</div>
+                </div>
+                <div className="log-entry">
+                  <div className="log-time">2025-10-11 10:38:42</div>
+                  <div className="log-type warning">WARNING</div>
+                  <div className="log-message">Bus #23 maintenance reminder sent</div>
+                </div>
+                <div className="log-entry">
+                  <div className="log-time">2025-10-11 10:35:18</div>
+                  <div className="log-type error">ERROR</div>
+                  <div className="log-message">Failed login attempt for user 'unknown@example.com'</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Backup Tab */}
+        {activeTab === 'backup' && (
+          <div className="tab-content backup-tab">
+            <div className="tab-header">
+              <h1>Backup & Restore</h1>
+            </div>
+
+            <div className="backup-section">
+              <h2>Database Backup</h2>
+              <div className="backup-options">
+                <button className="btn-primary">📦 Create Full Backup</button>
+                <button className="btn-secondary">📊 Backup User Data Only</button>
+                <button className="btn-secondary">🚌 Backup Trip Data Only</button>
+              </div>
+
+              <div className="backup-history">
+                <h3>Recent Backups</h3>
+                <div className="backup-list">
+                  <div className="backup-item">
+                    <div className="backup-info">
+                      <strong>Full System Backup</strong>
+                      <span>October 11, 2025 - 10:30 AM</span>
+                    </div>
+                    <div className="backup-actions">
+                      <button className="btn-small">⬇️ Download</button>
+                      <button className="btn-small">🔄 Restore</button>
+                    </div>
+                  </div>
+                  <div className="backup-item">
+                    <div className="backup-info">
+                      <strong>User Data Backup</strong>
+                      <span>October 10, 2025 - 6:00 PM</span>
+                    </div>
+                    <div className="backup-actions">
+                      <button className="btn-small">⬇️ Download</button>
+                      <button className="btn-small">🔄 Restore</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

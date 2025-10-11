@@ -24,11 +24,12 @@ import ParentDashboard from "./components/Parent/ParentDashboard";
 import OperationalDashboard from "./components/Operational/OperationalDashboard";
 import CoordinatorDashboard from "./components/Coordinator/CoordinatorDashboard";
 import CoordinatorProfileSettings from "./components/Coordinator/CoordinatorProfileSettings";
+import DriverDashboard from "./components/Driver/DriverDashboard";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // Protected Route Component
-const ProtectedRoute = ({ children, requireAdmin = false, requireParent = false, requireCoordinator = false }) => {
-  const { isAuthenticated, isAdmin, isParent, isCoordinator, isLoading } = useAuth();
+const ProtectedRoute = ({ children, requireAdmin = false, requireParent = false, requireCoordinator = false, requireDriver = false }) => {
+  const { isAuthenticated, isAdmin, isParent, isCoordinator, isDriver, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -57,6 +58,10 @@ const ProtectedRoute = ({ children, requireAdmin = false, requireParent = false,
   }
 
   if (requireCoordinator && !isCoordinator()) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (requireDriver && !isDriver()) {
     return <Navigate to="/" replace />;
   }
 
@@ -102,6 +107,11 @@ function App() {
           <Route path="/coordinator/profile" element={
             <ProtectedRoute requireCoordinator={true}>
               <CoordinatorProfileSettings />
+            </ProtectedRoute>
+          } />
+          <Route path="/driver/dashboard" element={
+            <ProtectedRoute requireDriver={true}>
+              <DriverDashboard />
             </ProtectedRoute>
           } />
           <Route path="/adddriver" element={<AddDriver />} />
