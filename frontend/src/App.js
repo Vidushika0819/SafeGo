@@ -21,6 +21,7 @@ import ParentLogin from "./components/Auth/ParentLogin";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import UserManagement from "./components/Admin/UserManagement/UserManagement";
 import ParentDashboard from "./components/Parent/ParentDashboard";
+import NotificationsCenter from "./components/Parent/NotificationsCenter";
 import OperationalDashboard from "./components/Operational/OperationalDashboard";
 import CoordinatorDashboard from "./components/Coordinator/CoordinatorDashboard";
 import CoordinatorProfileSettings from "./components/Coordinator/CoordinatorProfileSettings";
@@ -92,6 +93,11 @@ function App() {
           <Route path="/parent/dashboard" element={
             <ProtectedRoute requireParent={true}>
               <ParentDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/parent/dashboard/notifications" element={
+            <ProtectedRoute requireParent={true}>
+              <NotificationsCenter />
             </ProtectedRoute>
           } />
           <Route path="/operational/dashboard" element={

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../../context/AuthContext';
-import ParentSidebar from '../ParentSidebar';
+import ParentNavbar from '../ParentNavbar';
+import { Button } from '../../ui/button';
+import { Plus, Users, Search, Filter } from 'lucide-react';
 import ChildList from './ChildList';
 import ChildForm from './ChildForm';
 
@@ -43,155 +46,134 @@ const ChildrenManagement = () => {
     setRefreshTrigger(prev => prev + 1);
   };
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'active', 'inactive'
+
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f8f9fa',
-      display: 'flex'
-    }}>
-      {/* Sidebar */}
-      <ParentSidebar activeSection="children" />
+    <div className="min-h-screen bg-neutral-50">
+      {/* Modern Navbar */}
+      <ParentNavbar
+        user={user}
+        onNavigate={() => {}}
+        activeView="children"
+      />
 
-      {/* Main Content */}
-      <div style={{
-        flex: 1,
-        marginLeft: window.innerWidth <= 768 ? '0' : '280px',
-        transition: 'margin-left 0.3s ease',
-        minHeight: '100vh'
-      }}>
-        {/* Top Header Bar */}
-        <header style={{
-          backgroundColor: 'white',
-          padding: '15px 30px',
-          borderBottom: '1px solid #ecf0f1',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            maxWidth: '1200px',
-            margin: '0 auto'
-          }}>
-            {/* Breadcrumb Navigation */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              <span style={{
-                fontSize: '18px',
-                color: '#2c3e50'
-              }}>
-                🏠
-              </span>
-              <span style={{
-                color: '#7f8c8d',
-                fontSize: '14px'
-              }}>
-                Dashboard
-              </span>
-              <span style={{
-                color: '#bdc3c7',
-                fontSize: '14px',
-                margin: '0 5px'
-              }}>
-                /
-              </span>
-              <span style={{
-                color: '#2c3e50',
-                fontSize: '14px',
-                fontWeight: 'bold'
-              }}>
-                My Children
-              </span>
-            </div>
+      {/* Main Content Area with Animation */}
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={currentView}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="pt-16 min-h-screen"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {currentView === 'list' && (
+              <>
+                {/* Header Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="mb-8"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold text-neutral-900 flex items-center gap-3">
+                        <Users className="w-8 h-8 text-primary-600" />
+                        My Children
+                      </h1>
+                      <p className="mt-2 text-neutral-600">
+                        Manage your children's information and trip preferences
+                      </p>
+                    </div>
 
-            {/* User Info */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '15px'
-            }}>
-              <div style={{
-                textAlign: 'right'
-              }}>
-                <div style={{
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  color: '#2c3e50'
-                }}>
-                  {user?.email?.split('@')[0] || 'Parent'}
-                </div>
-                <div style={{
-                  fontSize: '12px',
-                  color: '#7f8c8d'
-                }}>
-                  Parent Account
-                </div>
-              </div>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button
+                        onClick={handleAddChild}
+                        className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 text-lg font-medium"
+                      >
+                        <Plus className="w-5 h-5 mr-2" />
+                        Add New Child
+                      </Button>
+                    </motion.div>
+                  </div>
+                </motion.div>
 
-              {/* User Avatar Placeholder */}
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#3498db',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '18px',
-                fontWeight: 'bold'
-              }}>
-                {user?.email?.charAt(0).toUpperCase() || 'P'}
-              </div>
-            </div>
+                {/* Search and Filter Bar */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white rounded-xl shadow-medium border border-neutral-200 p-6 mb-8"
+                >
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    {/* Search Input */}
+                    <div className="flex-1 relative">
+                      <Search className="w-5 h-5 text-neutral-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Search children by name..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                      />
+                    </div>
+
+                    {/* Filter Dropdown */}
+                    <div className="flex items-center gap-2 min-w-fit">
+                      <Filter className="w-5 h-5 text-neutral-500" />
+                      <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                      >
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Children List */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <ChildList
+                    key={refreshTrigger}
+                    searchTerm={searchTerm}
+                    filterStatus={filterStatus}
+                    onEditChild={handleEditChild}
+                    onViewChild={handleViewChild}
+                    onDeactivateChild={handleDeactivateChild}
+                  />
+                </motion.div>
+              </>
+            )}
+
+            {currentView === 'form' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ChildForm
+                  child={editingChild}
+                  onSave={handleSaveChild}
+                  onCancel={handleCancelForm}
+                />
+              </motion.div>
+            )}
           </div>
-        </header>
-
-        {/* Page Content */}
-        <main style={{
-          padding: '30px',
-          maxWidth: '1200px',
-          margin: '0 auto'
-        }}>
-          {currentView === 'list' ? (
-            <ChildList
-              key={refreshTrigger} // Force re-render when refresh is triggered
-              onEditChild={handleEditChild}
-              onViewChild={handleViewChild}
-              onDeactivateChild={handleDeactivateChild}
-            />
-          ) : (
-            <ChildForm
-              child={editingChild}
-              onSave={handleSaveChild}
-              onCancel={handleCancelForm}
-            />
-          )}
-        </main>
-      </div>
-
-      {/* Mobile Overlay for Sidebar */}
-      {window.innerWidth <= 768 && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            zIndex: 998,
-            display: 'none' // Controlled by sidebar component
-          }}
-          id="mobile-overlay"
-        />
-      )}
+        </motion.main>
+      </AnimatePresence>
     </div>
   );
 };

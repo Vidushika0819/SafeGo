@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const QuickActions = () => {
+const QuickActions = ({ onNavigate }) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
 
@@ -14,8 +15,15 @@ const QuickActions = () => {
   };
 
   const executeAction = (action) => {
-    // For now, just show an alert - in a real implementation, these would call APIs
-    alert(`${action.label} action would be executed here`);
+    // Navigate to relevant tabs instead of just showing alerts
+    if (action.navigateToTab) {
+      if (onNavigate && typeof onNavigate === 'function') {
+        onNavigate(action.navigateToTab);
+      }
+    } else {
+      // For now, just show an alert for actions without navigation - in a real implementation, these would call APIs
+      alert(`${action.label} action would be executed here`);
+    }
     setShowConfirmDialog(false);
     setPendingAction(null);
   };
@@ -35,50 +43,56 @@ const QuickActions = () => {
     {
       id: 'add-user',
       label: 'Add New User',
-      description: 'Create a new system user account',
+      description: 'Navigate to user management',
       icon: '👤',
       color: '#28a745',
-      requiresConfirmation: false
+      requiresConfirmation: false,
+      navigateToTab: 'users'
     },
     {
       id: 'view-reports',
-      label: 'Generate Report',
-      description: 'Create system usage report',
+      label: 'View Reports',
+      description: 'Navigate to system reports',
       icon: '📊',
       color: '#17a2b8',
-      requiresConfirmation: false
+      requiresConfirmation: false,
+      navigateToTab: 'reports'
     },
     {
-      id: 'system-backup',
-      label: 'System Backup',
-      description: 'Initiate system data backup',
-      icon: '💾',
-      color: '#ffc107',
-      requiresConfirmation: true
-    },
-    {
-      id: 'clear-cache',
-      label: 'Clear System Cache',
-      description: 'Clear all system caches',
-      icon: '🧹',
+      id: 'manage-trips',
+      label: 'Manage Trips',
+      description: 'Navigate to trip management',
+      icon: '�',
       color: '#6c757d',
-      requiresConfirmation: true
+      requiresConfirmation: false,
+      navigateToTab: 'trips'
     },
     {
-      id: 'emergency-stop',
-      label: 'Emergency Stop',
-      description: 'Stop all active trips (emergency only)',
-      icon: '🚨',
-      color: '#dc3545',
-      requiresConfirmation: true
+      id: 'fleet-management',
+      label: 'Bus Fleet',
+      description: 'Navigate to bus management',
+      icon: '🚐',
+      color: '#ffc107',
+      requiresConfirmation: false,
+      navigateToTab: 'buses'
     },
     {
       id: 'system-status',
-      label: 'Check System Status',
-      description: 'Run system health check',
-      icon: '🔍',
+      label: 'System Status',
+      description: 'Navigate to system overview',
+      icon: '�',
       color: '#007bff',
-      requiresConfirmation: false
+      requiresConfirmation: false,
+      navigateToTab: 'system'
+    },
+    {
+      id: 'system-tools',
+      label: 'System Tools',
+      description: 'Access settings, logs, and backup',
+      icon: '�️',
+      color: '#6f42c1',
+      requiresConfirmation: false,
+      navigateToTab: 'settings'
     }
   ];
 

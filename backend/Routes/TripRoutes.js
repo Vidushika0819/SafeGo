@@ -3,11 +3,14 @@ const router = express.Router();
 
 
 // Import Trip Controller (only once)
-const { getAllTrips, addTrips, getById, updateTripById, deleteTripById} = require("../Controllers/TripController.js");
+const { getAllTrips, getAvailableTrips, addTrips, getById, updateTripById, deleteTripById} = require("../Controllers/TripController.js");
 const { findByIdAndDelete } = require("../Models/TripModel.js");
 
 // Get all Trips
 router.get("/", getAllTrips);
+
+// Get available trips (for parents to book seats)
+router.get("/available", getAvailableTrips);
 
 // POST add trip
 router.post("/", addTrips);

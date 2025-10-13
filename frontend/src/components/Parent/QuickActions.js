@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Button } from '../ui/button';
+import { Plus, UserPlus, Bus, Armchair, MessageSquare, Settings, AlertTriangle, History, Bell } from 'lucide-react';
 
 const QuickActions = ({ onNavigate }) => {
+  const [bookingChild, setBookingChild] = useState(null);
+  const [availableSeats, setAvailableSeats] = useState(3); // Mock data
+
   const handleQuickAction = (action) => {
     switch (action) {
       case 'add-child':
@@ -13,49 +19,176 @@ const QuickActions = ({ onNavigate }) => {
           onNavigate('trips');
         }
         break;
+      case 'book-seat':
+        handleBookSeat();
+        break;
       case 'contact-admin':
-        alert('Contact Administrator will be implemented in Story 3.5: Parent Communication System');
+        if (onNavigate) {
+          onNavigate('messages');
+        }
         break;
       case 'update-profile':
-        alert('Profile Management will be implemented in future updates');
+        if (onNavigate) {
+          onNavigate('profile');
+        }
+        break;
+      case 'notifications':
+        if (onNavigate) {
+          onNavigate('notifications');
+        }
+        break;
+      case 'trip-history':
+        if (onNavigate) {
+          onNavigate('trips');
+        }
+        break;
+      case 'emergency-contact':
+        handleEmergencyContact();
         break;
       default:
-        alert(`Action "${action}" will be implemented in future stories`);
+        console.log(`Action "${action}" clicked`);
     }
+  };
+
+  const handleBookSeat = async () => {
+    try {
+      // First get available children
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5005/api/children', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const unassignedChildren = data.data.filter(child => !child.tripAssigned);
+
+        if (unassignedChildren.length === 0) {
+          alert('All your children are already assigned to trips. Please check the trips section for updates.');
+          return;
+        }
+
+        // Get available trips
+        const tripResponse = await fetch('http://localhost:5005/api/trips/available', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (tripResponse.ok) {
+          const tripData = await tripResponse.json();
+          const availableTrips = tripData.data.filter(trip => trip.availableSeats > 0);
+
+          if (availableTrips.length === 0) {
+            alert('No trips with available seats found. Please contact the administrator.');
+            return;
+          }
+
+          // Auto-assign first available child to first available trip
+          const childToAssign = unassignedChildren[0];
+          const tripToAssign = availableTrips[0];
+
+          const assignResponse = await fetch('http://localhost:5005/api/trip-assignments', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              childId: childToAssign._id,
+              tripId: tripToAssign._id,
+              assignedBy: 'parent-auto'
+            })
+          });
+
+          if (assignResponse.ok) {
+            alert(`🎉 Successfully booked a seat!\n\n${childToAssign.firstName} ${childToAssign.lastName} has been assigned to ${tripToAssign.routeName} on ${new Date(tripToAssign.departureTime).toLocaleDateString()}.\n\nDeparture: ${new Date(tripToAssign.departureTime).toLocaleTimeString()}`);
+            setAvailableSeats(prev => prev - 1);
+
+            // Navigate to trips to show the assignment
+            if (onNavigate) {
+              onNavigate('trips');
+            }
+          } else {
+            const errorData = await assignResponse.json();
+            alert(`Failed to book seat: ${errorData.message || 'Unknown error'}`);
+          }
+        } else {
+          alert('Failed to load available trips. Please try again.');
+        }
+      } else {
+        alert('Failed to load children information. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error booking seat:', error);
+      alert('Network error occurred. Please check your connection and try again.');
+    }
+  };
+
+  const handleEmergencyContact = () => {
+    alert('🚨 EMERGENCY CONTACT\n\nIf you have an immediate safety concern:\n\n📞 Call: (555) 123-HELP\n📧 Email: emergency@safego.com\n\nFor non-emergency issues, please use the Messages section.');
   };
 
   const quickActions = [
     {
+      id: 'book-seat',
+      title: 'Book a Seat Today',
+      description: 'Instantly assign your child to an available trip',
+      icon: <Armchair className="w-6 h-6" />,
+      color: 'primary',
+      bgColor: 'bg-primary-50',
+      borderColor: 'border-primary-200',
+      iconBg: 'bg-primary-100',
+      available: availableSeats > 0,
+      badge: `${availableSeats} seats available`
+    },
+    {
       id: 'add-child',
       title: 'Add New Child',
       description: 'Register a new child for transportation services',
-      icon: '👶',
-      color: '#3498db',
-      bgColor: '#ecf0f1'
+      icon: <UserPlus className="w-6 h-6" />,
+      color: 'primary',
+      bgColor: 'bg-neutral-50',
+      borderColor: 'border-neutral-200',
+      iconBg: 'bg-neutral-100'
     },
     {
       id: 'view-trips',
-      title: 'View Available Trips',
-      description: 'Browse and assign children to transportation routes',
-      icon: '🚌',
-      color: '#27ae60',
-      bgColor: '#d5f4e6'
+      title: 'View Active Trips',
+      description: 'Monitor current and upcoming transportation',
+      icon: <Bus className="w-6 h-6" />,
+      color: 'success',
+      bgColor: 'bg-success-50',
+      borderColor: 'border-success-200',
+      iconBg: 'bg-success-100'
     },
     {
       id: 'contact-admin',
-      title: 'Contact Administrator',
+      title: 'Contact Admin',
       description: 'Send messages to school administrators',
-      icon: '💬',
-      color: '#f39c12',
-      bgColor: '#fff3cd'
+      icon: <MessageSquare className="w-6 h-6" />,
+      color: 'secondary',
+      bgColor: 'bg-secondary-50',
+      borderColor: 'border-secondary-200',
+      iconBg: 'bg-secondary-100'
+    }
+  ];
+
+  const secondaryActions = [
+    {
+      id: 'trip-history',
+      title: 'Trip History',
+      description: 'View past transportation records',
+      icon: <History className="w-4 h-4" />
     },
     {
-      id: 'update-profile',
-      title: 'Update Profile',
-      description: 'Manage your account settings and preferences',
-      icon: '⚙️',
-      color: '#9b59b6',
-      bgColor: '#f5e6ff'
+      id: 'notifications',
+      title: 'Notifications',
+      description: 'Manage notification preferences',
+      icon: <Bell className="w-4 h-4" />
     }
   ];
 

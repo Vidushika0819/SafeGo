@@ -34,9 +34,9 @@ app.use("/parents", parentRouters);
 // pass - BfgwUDnfQIe71WHG
 mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log("MongoDB connected"))
-.then(async () => {
-    // Seed sample users for demonstration
-    await seedUsers();
+.then(() => {
+    // Optionally seed sample users for demonstration (commented out to preserve user data)
+    // await seedUsers();
     console.log("Backend server is running on port " + PORT);
     app.listen(PORT);
 })

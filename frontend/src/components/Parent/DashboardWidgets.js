@@ -1,143 +1,112 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Users, Bus, MessageSquare, Bell, AlertTriangle, MapPin, Clock, CheckCircle2 } from 'lucide-react';
+import { Button } from '../ui/button';
 
 const DashboardWidgets = () => {
-  // Mock data - will be replaced with real API data in future stories
+  const [realTimeData, setRealTimeData] = useState(null);
+
+  // Enhanced mock data with real-time simulation
   const mockData = {
     children: {
       total: 2,
       active: 2,
-      pendingApproval: 0
+      pendingApproval: 0,
+      onTrip: 1
     },
     trips: {
       today: 2,
       thisWeek: 8,
-      active: 1
+      active: 1,
+      completedToday: 1
     },
     stats: {
       messages: 3,
       notifications: 5,
-      pendingActions: 1
+      pendingActions: 1,
+      alerts: 0
     },
     system: {
       routes: 12,
       buses: 8,
-      drivers: 6
-    }
+      drivers: 6,
+      status: 'operational'
+    },
+    activeTrips: [
+      {
+        id: 1,
+        childName: 'Emma Johnson',
+        currentStatus: 'en-route',
+        destination: 'School',
+        estimatedArrival: '8:45 AM',
+        driver: 'John Smith',
+        lastUpdate: '2 min ago'
+      }
+    ]
   };
+
+  // Simulate real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRealTimeData(prev => ({
+        ...prev,
+        timestamp: new Date().toLocaleTimeString()
+      }));
+    }, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const formatNumber = (num) => {
     return num.toLocaleString();
   };
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '20px',
-      marginBottom: '30px'
-    }}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
+    >
       {/* Children Overview Widget */}
-      <div style={{
-        backgroundColor: 'white',
-        padding: '25px',
-        borderRadius: '12px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        border: '1px solid #ecf0f1'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <span style={{
-            fontSize: '24px',
-            marginRight: '12px'
-          }}>
-            👨‍👩‍👧‍👦
-          </span>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.1 }}
+        whileHover={{ scale: 1.02 }}
+        className="bg-white rounded-xl shadow-medium border border-neutral-200 p-6"
+      >
+        <div className="flex items-center mb-4">
+          <motion.div
+            className="p-3 bg-primary-50 rounded-lg mr-4"
+            whileHover={{ scale: 1.1 }}
+          >
+            <Users className="w-6 h-6 text-primary-600" />
+          </motion.div>
           <div>
-            <h3 style={{
-              margin: '0 0 5px 0',
-              color: '#2c3e50',
-              fontSize: '18px',
-              fontWeight: 'bold'
-            }}>
-              My Children
-            </h3>
-            <p style={{
-              margin: 0,
-              color: '#7f8c8d',
-              fontSize: '14px'
-            }}>
-              Children registered in the system
-            </p>
+            <h3 className="text-lg font-semibold text-neutral-900">My Children</h3>
+            <p className="text-sm text-neutral-600">Children registered in the system</p>
           </div>
         </div>
 
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '15px'
-        }}>
+        <div className="flex justify-between items-center mb-4">
           <div>
-            <div style={{
-              fontSize: '32px',
-              fontWeight: 'bold',
-              color: '#3498db',
-              marginBottom: '5px'
-            }}>
+            <div className="text-3xl font-bold text-primary-600 mb-1">
               {formatNumber(mockData.children.total)}
             </div>
-            <div style={{
-              fontSize: '14px',
-              color: '#7f8c8d'
-            }}>
-              Total Children
-            </div>
+            <div className="text-sm text-neutral-600">Total Children</div>
           </div>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            gap: '8px'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <div style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: '#27ae60'
-              }}></div>
-              <span style={{
-                fontSize: '12px',
-                color: '#27ae60',
-                fontWeight: 'bold'
-              }}>
-                {mockData.children.active} Active
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-success-600">
+                {mockData.children.onTrip} On Trip
               </span>
             </div>
             {mockData.children.pendingApproval > 0 && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <div style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: '#f39c12'
-                }}></div>
-                <span style={{
-                  fontSize: '12px',
-                  color: '#f39c12',
-                  fontWeight: 'bold'
-                }}>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-warning-500 rounded-full"></div>
+                <span className="text-sm font-medium text-warning-600">
                   {mockData.children.pendingApproval} Pending
                 </span>
               </div>
@@ -145,388 +114,261 @@ const DashboardWidgets = () => {
           </div>
         </div>
 
-        <button style={{
-          width: '100%',
-          padding: '10px',
-          backgroundColor: '#3498db',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontSize: '14px',
-          fontWeight: 'bold'
-        }}>
+        <Button
+          className="w-full bg-primary-600 hover:bg-primary-700 text-white"
+          onClick={() => window.location.href = '#/children'}
+        >
           Manage Children
-        </button>
-      </div>
+        </Button>
+      </motion.div>
 
-      {/* Active Trips Widget */}
-      <div style={{
-        backgroundColor: 'white',
-        padding: '25px',
-        borderRadius: '12px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        border: '1px solid #ecf0f1'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <span style={{
-            fontSize: '24px',
-            marginRight: '12px'
-          }}>
-            🚌
-          </span>
+      {/* Real-Time Trip Status Widget */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2 }}
+        whileHover={{ scale: 1.02 }}
+        className="bg-white rounded-xl shadow-medium border border-neutral-200 p-6"
+      >
+        <div className="flex items-center mb-4">
+          <motion.div
+            className="p-3 bg-secondary-50 rounded-lg mr-4"
+            whileHover={{ scale: 1.1 }}
+            animate={{
+              rotate: mockData.trips.active > 0 ? [0, 360] : 0,
+              transition: { duration: 2, repeat: Infinity, ease: "linear" }
+            }}
+          >
+            <Bus className="w-6 h-6 text-secondary-600" />
+          </motion.div>
           <div>
-            <h3 style={{
-              margin: '0 0 5px 0',
-              color: '#2c3e50',
-              fontSize: '18px',
-              fontWeight: 'bold'
-            }}>
-              Active Trips
-            </h3>
-            <p style={{
-              margin: 0,
-              color: '#7f8c8d',
-              fontSize: '14px'
-            }}>
-              Current trip assignments
-            </p>
+            <h3 className="text-lg font-semibold text-neutral-900">Active Trips</h3>
+            <p className="text-sm text-neutral-600">Real-time trip monitoring</p>
           </div>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '15px',
-          marginBottom: '20px'
-        }}>
-          <div style={{
-            textAlign: 'center',
-            padding: '15px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '8px'
-          }}>
-            <div style={{
-              fontSize: '24px',
-              fontWeight: 'bold',
-              color: '#e74c3c',
-              marginBottom: '5px'
-            }}>
+        {/* Active Trip Display */}
+        <div className="mb-4 space-y-3">
+          {mockData.activeTrips.map((trip) => (
+            <motion.div
+              key={trip.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-neutral-50 rounded-lg p-3 border border-neutral-200"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary-500" />
+                  <span className="font-medium text-sm">{trip.childName}</span>
+                </div>
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    transition: { duration: 2, repeat: Infinity }
+                  }}
+                  className="w-2 h-2 bg-success-500 rounded-full"
+                />
+              </div>
+              <div className="flex items-center justify-between text-xs text-neutral-600">
+                <span>→ {trip.destination}</span>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  <span>{trip.estimatedArrival}</span>
+                </div>
+              </div>
+              <div className="text-xs text-neutral-500 mt-1">
+                Driver: {trip.driver} • Updated {trip.lastUpdate}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="text-center p-3 bg-neutral-50 rounded-lg">
+            <div className="text-2xl font-bold text-secondary-600 mb-1">
               {formatNumber(mockData.trips.today)}
             </div>
-            <div style={{
-              fontSize: '12px',
-              color: '#7f8c8d'
-            }}>
-              Today
-            </div>
+            <div className="text-xs text-neutral-600">Today</div>
           </div>
-
-          <div style={{
-            textAlign: 'center',
-            padding: '15px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '8px'
-          }}>
-            <div style={{
-              fontSize: '24px',
-              fontWeight: 'bold',
-              color: '#27ae60',
-              marginBottom: '5px'
-            }}>
+          <div className="text-center p-3 bg-neutral-50 rounded-lg">
+            <div className="text-2xl font-bold text-success-600 mb-1">
               {formatNumber(mockData.trips.active)}
             </div>
-            <div style={{
-              fontSize: '12px',
-              color: '#7f8c8d'
-            }}>
-              In Progress
-            </div>
+            <div className="text-xs text-neutral-600">In Progress</div>
           </div>
         </div>
 
-        <button style={{
-          width: '100%',
-          padding: '10px',
-          backgroundColor: '#27ae60',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontSize: '14px',
-          fontWeight: 'bold'
-        }}>
+        <Button
+          variant="outline"
+          className="w-full border-secondary-300 text-secondary-700 hover:bg-secondary-50"
+          onClick={() => window.location.href = '#/trips'}
+        >
           View All Trips
-        </button>
-      </div>
+        </Button>
+      </motion.div>
 
-      {/* Quick Stats Widget */}
-      <div style={{
-        backgroundColor: 'white',
-        padding: '25px',
-        borderRadius: '12px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        border: '1px solid #ecf0f1'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <span style={{
-            fontSize: '24px',
-            marginRight: '12px'
-          }}>
-            📊
-          </span>
+      {/* Quick Notifications Widget */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.3 }}
+        whileHover={{ scale: 1.02 }}
+        className="bg-white rounded-xl shadow-medium border border-neutral-200 p-6"
+      >
+        <div className="flex items-center mb-4">
+          <motion.div
+            className="p-3 bg-accent-50 rounded-lg mr-4 relative"
+            whileHover={{ scale: 1.1 }}
+          >
+            <Bell className="w-6 h-6 text-accent-600" />
+            {mockData.stats.notifications > 0 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 w-4 h-4 bg-error-500 rounded-full flex items-center justify-center"
+              >
+                <span className="text-xs text-white font-medium">
+                  {mockData.stats.notifications > 99 ? '99+' : mockData.stats.notifications}
+                </span>
+              </motion.div>
+            )}
+          </motion.div>
           <div>
-            <h3 style={{
-              margin: '0 0 5px 0',
-              color: '#2c3e50',
-              fontSize: '18px',
-              fontWeight: 'bold'
-            }}>
-              Quick Stats
-            </h3>
-            <p style={{
-              margin: 0,
-              color: '#7f8c8d',
-              fontSize: '14px'
-            }}>
-              Overview of your activity
-            </p>
+            <h3 className="text-lg font-semibold text-neutral-900">Notifications</h3>
+            <p className="text-sm text-neutral-600">Stay updated on activities</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '12px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '6px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '16px' }}>💬</span>
-              <span style={{ fontSize: '14px', color: '#2c3e50' }}>Unread Messages</span>
+        <div className="space-y-3">
+          <motion.div
+            whileHover={{ x: 4 }}
+            className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg cursor-pointer hover:bg-neutral-100 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <MessageSquare className="w-4 h-4 text-primary-500" />
+              <div>
+                <div className="text-sm font-medium text-neutral-900">Unread Messages</div>
+                <div className="text-xs text-neutral-600">Check your inbox</div>
+              </div>
             </div>
-            <span style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              color: '#3498db'
-            }}>
+            <span className="text-sm font-bold text-primary-600 bg-primary-100 px-2 py-1 rounded-full">
               {mockData.stats.messages}
             </span>
-          </div>
+          </motion.div>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '12px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '6px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '16px' }}>🔔</span>
-              <span style={{ fontSize: '14px', color: '#2c3e50' }}>Notifications</span>
+          <motion.div
+            whileHover={{ x: 4 }}
+            className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg cursor-pointer hover:bg-neutral-100 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Bell className="w-4 h-4 text-secondary-500" />
+              <div>
+                <div className="text-sm font-medium text-neutral-900">System Alerts</div>
+                <div className="text-xs text-neutral-600">Important updates</div>
+              </div>
             </div>
-            <span style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              color: '#f39c12'
-            }}>
+            <span className="text-sm font-bold text-secondary-600 bg-secondary-100 px-2 py-1 rounded-full">
               {mockData.stats.notifications}
             </span>
-          </div>
+          </motion.div>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '12px',
-            backgroundColor: '#fff3cd',
-            borderRadius: '6px',
-            border: '1px solid #ffeaa7'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '16px' }}>⚡</span>
-              <span style={{ fontSize: '14px', color: '#856404' }}>Pending Actions</span>
-            </div>
-            <span style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              color: '#856404'
-            }}>
-              {mockData.stats.pendingActions}
-            </span>
-          </div>
+          {mockData.stats.alerts > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center justify-between p-3 bg-warning-50 border border-warning-200 rounded-lg"
+            >
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-4 h-4 text-warning-600" />
+                <div>
+                  <div className="text-sm font-medium text-warning-900">Action Required</div>
+                  <div className="text-xs text-warning-700">Review pending items</div>
+                </div>
+              </div>
+              <span className="text-sm font-bold text-warning-600 bg-warning-100 px-2 py-1 rounded-full">
+                {mockData.stats.alerts}
+              </span>
+            </motion.div>
+          )}
         </div>
-      </div>
+      </motion.div>
 
-      {/* System Status Widget */}
-      <div style={{
-        backgroundColor: 'white',
-        padding: '25px',
-        borderRadius: '12px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        border: '1px solid #ecf0f1'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <span style={{
-            fontSize: '24px',
-            marginRight: '12px'
-          }}>
-            🏫
-          </span>
+      {/* System Health Widget */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.4 }}
+        whileHover={{ scale: 1.02 }}
+        className="bg-white rounded-xl shadow-medium border border-neutral-200 p-6"
+      >
+        <div className="flex items-center mb-4">
+          <motion.div
+            className="p-3 bg-success-50 rounded-lg mr-4 relative"
+            whileHover={{ scale: 1.1 }}
+          >
+            <CheckCircle2 className="w-6 h-6 text-success-600" />
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                transition: { duration: 2, repeat: Infinity }
+              }}
+              className="absolute top-0 right-0 w-2 h-2 bg-success-500 rounded-full"
+            />
+          </motion.div>
           <div>
-            <h3 style={{
-              margin: '0 0 5px 0',
-              color: '#2c3e50',
-              fontSize: '18px',
-              fontWeight: 'bold'
-            }}>
-              System Status
-            </h3>
-            <p style={{
-              margin: 0,
-              color: '#7f8c8d',
-              fontSize: '14px'
-            }}>
-              SafeGo system overview
-            </p>
+            <h3 className="text-lg font-semibold text-neutral-900">System Health</h3>
+            <p className="text-sm text-neutral-600">SafeGo platform status</p>
           </div>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '15px',
-          marginBottom: '20px'
-        }}>
-          <div style={{
-            textAlign: 'center',
-            padding: '15px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '8px'
-          }}>
-            <div style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: '#3498db',
-              marginBottom: '5px'
-            }}>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="text-center p-3 bg-neutral-50 rounded-lg">
+            <div className="text-xl font-bold text-primary-600 mb-1">
               {formatNumber(mockData.system.routes)}
             </div>
-            <div style={{
-              fontSize: '12px',
-              color: '#7f8c8d'
-            }}>
-              Routes
-            </div>
+            <div className="text-xs text-neutral-600">Routes</div>
           </div>
-
-          <div style={{
-            textAlign: 'center',
-            padding: '15px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '8px'
-          }}>
-            <div style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: '#27ae60',
-              marginBottom: '5px'
-            }}>
+          <div className="text-center p-3 bg-neutral-50 rounded-lg">
+            <div className="text-xl font-bold text-success-600 mb-1">
               {formatNumber(mockData.system.buses)}
             </div>
-            <div style={{
-              fontSize: '12px',
-              color: '#7f8c8d'
-            }}>
-              Buses
-            </div>
+            <div className="text-xs text-neutral-600">Buses</div>
           </div>
-
-          <div style={{
-            textAlign: 'center',
-            padding: '15px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '8px'
-          }}>
-            <div style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: '#9b59b6',
-              marginBottom: '5px'
-            }}>
+          <div className="text-center p-3 bg-neutral-50 rounded-lg">
+            <div className="text-xl font-bold text-accent-600 mb-1">
               {formatNumber(mockData.system.drivers)}
             </div>
-            <div style={{
-              fontSize: '12px',
-              color: '#7f8c8d'
-            }}>
-              Drivers
-            </div>
+            <div className="text-xs text-neutral-600">Drivers</div>
           </div>
-
-          <div style={{
-            textAlign: 'center',
-            padding: '15px',
-            backgroundColor: '#27ae60',
-            borderRadius: '8px'
-          }}>
-            <div style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: 'white',
-              marginBottom: '5px'
-            }}>
+          <div className="text-center p-3 bg-success-500 rounded-lg">
+            <div className="text-xl font-bold text-white mb-1">
               ✓
             </div>
-            <div style={{
-              fontSize: '12px',
-              color: 'white',
-              opacity: 0.9
-            }}>
-              Online
-            </div>
+            <div className="text-xs text-white/90">Online</div>
           </div>
         </div>
 
-        <div style={{
-          padding: '15px',
-          backgroundColor: '#d4edda',
-          borderRadius: '6px',
-          border: '1px solid #c3e6cb'
-        }}>
-          <div style={{
-            fontSize: '14px',
-            color: '#155724',
-            fontWeight: 'bold',
-            marginBottom: '5px'
-          }}>
-            ✅ System Operational
+        <div className={`text-center py-3 px-4 rounded-lg ${
+          mockData.system.status === 'operational'
+            ? 'bg-success-50 border border-success-200'
+            : 'bg-error-50 border border-error-200'
+        }`}>
+          <div className={`text-sm font-semibold ${
+            mockData.system.status === 'operational' ? 'text-success-800' : 'text-error-800'
+          }`}>
+            {mockData.system.status === 'operational' ? '✅ All Systems Operational' : '❌ System Issues'}
           </div>
-          <div style={{
-            fontSize: '12px',
-            color: '#155724',
-            opacity: 0.8
-          }}>
-            All services running normally
+          <div className={`text-xs mt-1 ${
+            mockData.system.status === 'operational' ? 'text-success-700' : 'text-error-700'
+          }`}>
+            {mockData.system.status === 'operational'
+              ? `Last updated ${realTimeData?.timestamp || new Date().toLocaleTimeString()}`
+              : 'Please contact support'
+            }
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

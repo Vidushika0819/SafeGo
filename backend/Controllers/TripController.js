@@ -18,6 +18,31 @@ const getAllTrips = async (req, res, next) => {
   }
 };
 
+// Get available trips (for parents to book seats)
+const getAvailableTrips = async (req, res, next) => {
+  try {
+    const trips = await Trip.find({
+      status: 'scheduled', // or whatever status indicates available trips
+      availableSeats: { $gt: 0 }
+    })
+      .populate('busId')
+      .populate('driverId')
+      .populate('coordinatorId')
+      .sort({ date: 1, start_time: 1 }); // Sort by date and time
+
+    return res.status(200).json({
+      success: true,
+      data: trips,
+      count: trips.length
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 //data insert
 const addTrips = async (req, res, next) => {
   const { Trip_ID, date, start_time, end_time, start_location, route, status, busId, driverId, coordinatorId } =
@@ -125,6 +150,7 @@ const deleteTripById = async (req, res, next) => {
 
 //export All functions
 exports.getAllTrips = getAllTrips;
+exports.getAvailableTrips = getAvailableTrips;
 exports.addTrips = addTrips;
 exports.getById = getById;
 exports.updateTripById = updateTripById;

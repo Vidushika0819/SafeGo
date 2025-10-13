@@ -5,19 +5,19 @@ const tripSchema = new Schema({
   Trip_ID: {
        type: String, required: true, unique: true }, // primary key
 
-  date: { 
+  date: {
     type: Date, required: true },
 
-  start_time: { 
+  start_time: {
     type: String, required: true },
 
-  end_time: { 
+  end_time: {
     type: String, required: true },
 
-  start_location: { 
+  start_location: {
     type: String, required: true },
 
-  route: { 
+  route: {
     type: String, required: true },
 
   status: {
@@ -34,6 +34,27 @@ const tripSchema = new Schema({
 
   coordinatorId: {
     type: mongoose.Schema.Types.ObjectId, ref: "Coordinator", required: true }, // Reference to Coordinator
+
+  // Additional fields for parent seat booking
+  availableSeats: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+
+  routeName: {
+    type: String,
+    trim: true
+  },
+
+  departureTime: {
+    type: Date
+  },
+
+  busNumber: {
+    type: String,
+    trim: true
+  }
 
 });
 
