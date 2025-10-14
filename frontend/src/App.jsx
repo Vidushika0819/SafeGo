@@ -6,7 +6,6 @@ import { isAuthenticated } from './utils/auth';
 
 // Components
 import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
@@ -43,8 +42,6 @@ const RootRoute = () => {
 };
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
-
   return (
     <Router>
       <div className="App">
@@ -79,11 +76,10 @@ function App() {
             } 
           />
           
-          {/* Protected Routes - with sidebar/navbar */}
+          {/* Protected Routes - with navbar */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <Dashboard />
               </div>
@@ -93,7 +89,6 @@ function App() {
           <Route path="/daily-checks" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <DailyCheckList />
               </div>
@@ -103,7 +98,6 @@ function App() {
           <Route path="/daily-checks/new" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <DailyCheckForm />
               </div>
@@ -113,7 +107,6 @@ function App() {
           <Route path="/daily-checks/:id/edit" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <DailyCheckForm />
               </div>
@@ -123,7 +116,6 @@ function App() {
           <Route path="/maintenance" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <MaintenanceList />
               </div>
@@ -133,7 +125,6 @@ function App() {
           <Route path="/maintenance/new" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <MaintenanceForm />
               </div>
@@ -143,7 +134,6 @@ function App() {
           <Route path="/maintenance/:id/edit" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <MaintenanceForm />
               </div>
@@ -153,7 +143,6 @@ function App() {
           <Route path="/monthly-reports" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <MonthlyReportList />
               </div>
@@ -163,7 +152,6 @@ function App() {
           <Route path="/monthly-reports/new" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <MonthlyReportForm />
               </div>
@@ -173,7 +161,6 @@ function App() {
           <Route path="/monthly-reports/:id/edit" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <MonthlyReportForm />
               </div>
@@ -183,7 +170,6 @@ function App() {
           <Route path="/vehicles" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <VehicleManagement />
               </div>
@@ -193,7 +179,6 @@ function App() {
           <Route path="/users" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <UserManagement />
               </div>
@@ -203,7 +188,6 @@ function App() {
           <Route path="/reports" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <Reports />
               </div>
@@ -213,7 +197,6 @@ function App() {
           <Route path="/admin" element={
             <ProtectedRoute>
               <Navbar />
-              <Sidebar />
               <div style={{marginLeft: 220, minHeight: '100vh', background: '#fafbfc', padding: '32px 24px 24px 24px'}}>
                 <AdminDashboard />
               </div>
