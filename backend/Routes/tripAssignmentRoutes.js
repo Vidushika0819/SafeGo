@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { authenticateToken, requireRole } = require('./authRoutes');
 
-// Import trip assignment controller
+// Import controllers
 const {
   getTripAssignments,
   getTripAssignment,
@@ -10,10 +10,19 @@ const {
   updateTripAssignment,
   cancelTripAssignment,
   getAvailableTrips,
-  getAssignmentStats
+  getAssignmentStats,
+  checkinStudent,
+  checkoutStudent
 } = require('../Controllers/tripAssignmentController');
 
-// All routes require authentication and parent role
+const { getStudentsForCheckin } = require('../Controllers/CoordinatorControllers');
+
+// Coordinator specific routes
+router.get('/students-for-checkin', authenticateToken, requireRole('coordinator'), getStudentsForCheckin);
+router.put('/:id/checkin', authenticateToken, requireRole('coordinator'), checkinStudent);
+router.put('/:id/checkout', authenticateToken, requireRole('coordinator'), checkoutStudent);
+
+// All routes require authentication and parent role (for remaining parent operations)
 router.use(authenticateToken);
 router.use(requireRole('parent'));
 

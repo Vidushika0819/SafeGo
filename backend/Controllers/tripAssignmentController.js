@@ -2,6 +2,7 @@ const TripAssignment = require('../Models/TripAssignment');
 const Trip = require('../Models/TripModel');
 const Child = require('../Models/Child');
 const User = require('../Models/User');
+const { sendStudentStatusNotification } = require('../services/notificationService');
 
 // Get all trip assignments for the authenticated parent
 const getTripAssignments = async (req, res) => {
@@ -415,6 +416,78 @@ const getAssignmentStats = async (req, res) => {
   }
 };
 
+const checkinStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const assignment = await TripAssignment.findById(id).populate('child').populate('child.parent');
+
+    if (!assignment || assignment.status !== 'active') {
+      return res.status(404).json({ success: false, message: 'Assignment not found or inactive' });
+    }
+
+    if (assignment.checkinStatus !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Student already checked in' });
+    }
+
+    assignment.checkinStatus = 'checked_in';
+    assignment.checkinTimestamp = new Date();
+    await assignment.save();
+
+    // Send notification to parent (non-blocking)
+    const parentEmail = assignment.child.parent.email;
+    const childName = `${assignment.child.firstName} ${assignment.child.lastName || ''}`.trim();
+    sendStudentStatusNotification(parentEmail, assignment.child.parent._id, childName, 'checked_in').catch(console.error);
+
+    res.status(200).json({
+      success: true,
+      data: assignment,
+      message: 'Student checked in successfully'
+    });
+  } catch (error) {
+    console.error('Error checking in student:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error checking in student'
+    });
+  }
+};
+
+const checkoutStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const assignment = await TripAssignment.findById(id).populate('child').populate('child.parent');
+
+    if (!assignment || assignment.status !== 'active') {
+      return res.status(404).json({ success: false, message: 'Assignment not found or inactive' });
+    }
+
+    if (assignment.checkinStatus !== 'checked_in') {
+      return res.status(400).json({ success: false, message: 'Student not checked in yet' });
+    }
+
+    assignment.checkinStatus = 'dropped_off';
+    assignment.checkoutTimestamp = new Date();
+    await assignment.save();
+
+    // Send notification to parent (non-blocking)
+    const parentEmail = assignment.child.parent.email;
+    const childName = `${assignment.child.firstName} ${assignment.child.lastName || ''}`.trim();
+    sendStudentStatusNotification(parentEmail, assignment.child.parent._id, childName, 'dropped_off').catch(console.error);
+
+    res.status(200).json({
+      success: true,
+      data: assignment,
+      message: 'Student checked out successfully'
+    });
+  } catch (error) {
+    console.error('Error checking out student:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error checking out student'
+    });
+  }
+};
+
 module.exports = {
   getTripAssignments,
   getTripAssignment,
@@ -422,5 +495,7 @@ module.exports = {
   updateTripAssignment,
   cancelTripAssignment,
   getAvailableTrips,
-  getAssignmentStats
+  getAssignmentStats,
+  checkinStudent,
+  checkoutStudent
 };

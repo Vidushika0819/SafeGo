@@ -25,7 +25,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/children", childRoutes);
 app.use("/api/trip-assignments", tripAssignmentRoutes);
 app.use("/api/messages", messageRoutes);
-app.use("/trips", TripRoutes);
+app.use("/api/trips", TripRoutes);
 app.use("/drivers", driverRouters);
 app.use("/coordinators", coordinatorRouters);
 app.use("/buses", busRouters);
@@ -36,7 +36,7 @@ mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log("MongoDB connected"))
 .then(() => {
     // Optionally seed sample users for demonstration (commented out to preserve user data)
-    // await seedUsers();
+    // seedUsers();
     console.log("Backend server is running on port " + PORT);
     app.listen(PORT);
 })

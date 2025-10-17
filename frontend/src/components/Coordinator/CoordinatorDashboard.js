@@ -1,497 +1,311 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './CoordinatorDashboard.css';
+import {
+  Bus,
+  Users,
+  BarChart3,
+  Settings,
+  MessageSquare,
+  MapPin,
+  Activity,
+  TrendingUp,
+  Clock,
+  Shield,
+  Bell,
+  Home,
+  UserPlus,
+  Edit,
+  Eye,
+  ArrowRight,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  ChevronDown,
+  Star
+} from 'lucide-react';
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '../ui/navigation-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { Button } from '../ui/button';
+import CoordinatorNavbar from './CoordinatorNavbar';
+import CoordinatorStats from './CoordinatorStats';
+import CoordinatorActions from './CoordinatorActions';
+import ActivityFeed from './ActivityFeed';
+import CoordinatorProfileSettings from './CoordinatorProfileSettings';
+import TripManagement from './TripManagement/TripManagement';
+import PassengerManagement from './PassengerManagement/PassengerManagement';
+import StudentTracking from './StudentTracking/StudentTracking';
+import ReportsAnalytics from './Reports/ReportsAnalytics';
 
 const CoordinatorDashboard = () => {
   const { user, logout, getToken } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [stats, setStats] = useState({
-    totalTrips: 0,
-    activeTrips: 0,
-    totalChildren: 0,
-    totalParents: 0
-  });
-  const [loading, setLoading] = useState(true);
+  const [currentView, setCurrentView] = useState('dashboard');
 
-  useEffect(() => {
-    fetchDashboardStats();
-  }, []);
+  // Redirect if not a coordinator
+  if (!user || user.role !== 'coordinator') {
+    window.location.href = '/login';
+    return null;
+  }
 
-  const fetchDashboardStats = async () => {
-    try {
-      const token = getToken();
-      // You can add API calls here to fetch coordinator-specific stats
-      // For now, we'll use placeholder data
-      setStats({
-        totalTrips: 12,
-        activeTrips: 5,
-        totalChildren: 89,
-        totalParents: 67
-      });
-    } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
-    } finally {
-      setLoading(false);
+  const handleNavigation = (view) => {
+    setCurrentView(view);
+    // Smooth scroll to top when changing views
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getViewTitle = () => {
+    switch (currentView) {
+      case 'dashboard':
+        return 'Dashboard';
+      case 'trips':
+        return 'Trip Management';
+      case 'passengers':
+        return 'Passenger Management';
+      case 'reports':
+        return 'Reports & Analytics';
+      case 'student-tracking':
+        return 'Student Tracking';
+      default:
+        return 'Dashboard';
     }
   };
 
-  const handleLogout = () => {
-    logout();
-  };
-
-  const navigateToProfileSettings = () => {
-    navigate('/coordinator/profile');
-  };
-
-  const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-    setIsDropdownOpen(false);
-  };
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading your dashboard...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="coordinator-dashboard">
-      {/* Modern Navbar */}
-      <nav className="dashboard-navbar">
-        <div className="nav-container">
-          <div className="nav-brand">
-            <h2>🚍 SafeGo Coordinator</h2>
-          </div>
+    <div className="min-h-screen bg-neutral-50">
+      {/* Modern Coordinator Navbar */}
+      <CoordinatorNavbar
+        user={user}
+        onNavigate={handleNavigation}
+        activeView={currentView}
+      />
 
-          <div className="nav-menu">
-            <button
-              className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => handleTabChange('dashboard')}
-            >
-              <span className="tab-icon">📊</span>
-              <span className="tab-text">Dashboard</span>
-            </button>
+      {/* Main Content Area with Animation */}
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={currentView}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="pt-16 min-h-screen"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {currentView === 'dashboard' && (
+              <>
+                {/* Hero Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mb-12 text-center"
+                >
+                  <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4">
+                    Welcome back,{' '}
+                    <span className="text-primary-600">
+                      {user?.name?.split(' ')[0] || 'Coordinator'}
+                    </span>
+                    <motion.span
+                      animate={{ rotate: [0, 14, -8, 14, -4, 10, 0, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
+                      className="inline-block ml-2"
+                    >
+                      👋
+                    </motion.span>
+                  </h1>
+                  <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
+                    Here's your comprehensive coordination overview for today's transportation operations.
+                  </p>
+                </motion.div>
 
-            <button
-              className={`nav-tab ${activeTab === 'trips' ? 'active' : ''}`}
-              onClick={() => handleTabChange('trips')}
-            >
-              <span className="tab-icon">🚌</span>
-              <span className="tab-text">Trips</span>
-            </button>
+                {/* Modern Stats Cards */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <CoordinatorStats />
+                </motion.div>
 
-            <button
-              className={`nav-tab ${activeTab === 'passengers' ? 'active' : ''}`}
-              onClick={() => handleTabChange('passengers')}
-            >
-              <span className="tab-icon">👨‍👩‍👧‍👦</span>
-              <span className="tab-text">Passengers</span>
-            </button>
+                {/* Quick Actions */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <CoordinatorActions onNavigate={handleNavigation} />
+                </motion.div>
 
-            <button
-              className={`nav-tab ${activeTab === 'reports' ? 'active' : ''}`}
-              onClick={() => handleTabChange('reports')}
-            >
-              <span className="tab-icon">📈</span>
-              <span className="tab-text">Reports</span>
-            </button>
+                {/* Recent Activity */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  <ActivityFeed />
+                </motion.div>
+              </>
+            )}
 
-            {/* Dropdown Menu */}
-            <div className="dropdown-container">
-              <button
-                className="dropdown-toggle"
-                onClick={toggleDropdown}
+            {currentView === 'trips' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
               >
-                <span className="tab-icon">⚙️</span>
-                <span className="tab-text">More</span>
-                <span className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`}>▼</span>
-              </button>
+                <TripManagement />
+              </motion.div>
+            )}
 
-              {isDropdownOpen && (
-                <div className="dropdown-menu">
-                  <button
-                    className="dropdown-item"
-                    onClick={navigateToProfileSettings}
-                  >
-                    👤 Profile Settings
-                  </button>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => handleTabChange('settings')}
-                  >
-                    🔧 Preferences
-                  </button>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => handleTabChange('help')}
-                  >
-                    ❓ Help & Support
-                  </button>
-                  <div className="dropdown-divider"></div>
-                  <button
-                    className="dropdown-item logout"
-                    onClick={handleLogout}
-                  >
-                    🚪 Logout
-                  </button>
+            {currentView === 'passengers' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <PassengerManagement />
+              </motion.div>
+            )}
+
+            {currentView === 'reports' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ReportsAnalytics />
+              </motion.div>
+            )}
+
+            {currentView === 'student-tracking' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <StudentTracking />
+              </motion.div>
+            )}
+
+            {/* Profile view */}
+            {currentView === 'profile' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-xl shadow-medium p-8"
+              >
+                <CoordinatorProfileSettings />
+              </motion.div>
+            )}
+
+            {/* Settings view */}
+            {currentView === 'settings' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-xl shadow-medium p-8 space-y-8"
+              >
+                <div className="text-center">
+                  <Settings className="w-16 h-16 text-primary-500 mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-neutral-900 mb-4">
+                    Dashboard Preferences
+                  </h2>
+                  <p className="text-neutral-600 max-w-2xl mx-auto">
+                    Coming soon! We'll soon provide comprehensive settings to customize your coordination dashboard experience.
+                  </p>
                 </div>
-              )}
-            </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-neutral-900">Notification Preferences</h3>
+                    <div className="space-y-3">
+                      <label className="flex items-center space-x-3 p-3 bg-neutral-50 rounded-lg">
+                        <input type="checkbox" defaultChecked className="rounded" />
+                        <span className="text-sm text-neutral-700">Email notifications for trip updates</span>
+                      </label>
+                      <label className="flex items-center space-x-3 p-3 bg-neutral-50 rounded-lg">
+                        <input type="checkbox" defaultChecked className="rounded" />
+                        <span className="text-sm text-neutral-700">SMS alerts for urgent issues</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-neutral-900">Display Preferences</h3>
+                    <div className="space-y-3">
+                      <label className="flex items-center space-x-3 p-3 bg-neutral-50 rounded-lg">
+                        <input type="checkbox" className="rounded" />
+                        <span className="text-sm text-neutral-700">Show passenger photos</span>
+                      </label>
+                      <label className="flex items-center space-x-3 p-3 bg-neutral-50 rounded-lg">
+                        <input type="checkbox" className="rounded" />
+                        <span className="text-sm text-neutral-700">Dark mode (coming soon)</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Help view */}
+            {currentView === 'help' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-xl shadow-medium p-8"
+              >
+                <div className="text-center">
+                  <Activity className="w-16 h-16 text-primary-500 mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-neutral-900 mb-4">
+                    Help & Support Center
+                  </h2>
+                  <p className="text-neutral-600 max-w-2xl mx-auto mb-8">
+                    Get help with coordination tasks, troubleshooting, and best practices.
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+                    <Bus className="w-8 h-8 text-blue-600 mb-3" />
+                    <h3 className="font-semibold text-neutral-900 mb-2">Trip Management</h3>
+                    <p className="text-sm text-neutral-600">Learn how to create, monitor, and manage transportation trips effectively.</p>
+                  </div>
+
+                  <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
+                    <Users className="w-8 h-8 text-green-600 mb-3" />
+                    <h3 className="font-semibold text-neutral-900 mb-2">Passenger Coordination</h3>
+                    <p className="text-sm text-neutral-600">Manage passenger information, assignments, and communication.</p>
+                  </div>
+
+                  <div className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+                    <BarChart3 className="w-8 h-8 text-purple-600 mb-3" />
+                    <h3 className="font-semibold text-neutral-900 mb-2">Reports & Analytics</h3>
+                    <p className="text-sm text-neutral-600">Generate insights and track performance metrics.</p>
+                  </div>
+                </div>
+
+                <div className="mt-8 p-6 bg-neutral-50 rounded-xl">
+                  <h3 className="font-semibold text-neutral-900 mb-3">Need More Help?</h3>
+                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-neutral-600 mb-2"><strong>Email Support:</strong></p>
+                      <p className="font-mono">coordinator.support@safego.com</p>
+                    </div>
+                    <div>
+                      <p className="text-neutral-600 mb-2"><strong>Phone Support:</strong></p>
+                      <p className="font-mono">+94 11 123 4567 (Mon-Fri 8AM-6PM)</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </div>
-        </div>
-      </nav>
-
-      {/* Tab Content Container */}
-      <div className="tab-content-container">
-        {/* Dashboard Tab */}
-        {activeTab === 'dashboard' && (
-          <div className="tab-content dashboard-tab">
-            <div className="welcome-section">
-              <h1>Welcome back, {user?.email?.split('@')[0] || 'Coordinator'}! 👋</h1>
-              <p>Here's your trip coordination overview for today</p>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="stats-grid">
-              <div className="stat-card primary">
-                <div className="stat-icon">🚌</div>
-                <div className="stat-content">
-                  <h3>{stats.totalTrips}</h3>
-                  <p>Total Trips</p>
-                </div>
-              </div>
-
-              <div className="stat-card success">
-                <div className="stat-icon">✅</div>
-                <div className="stat-content">
-                  <h3>{stats.activeTrips}</h3>
-                  <p>Active Trips</p>
-                </div>
-              </div>
-
-              <div className="stat-card warning">
-                <div className="stat-icon">👶</div>
-                <div className="stat-content">
-                  <h3>{stats.totalChildren}</h3>
-                  <p>Total Children</p>
-                </div>
-              </div>
-
-              <div className="stat-card info">
-                <div className="stat-icon">👨‍👩‍👧‍👦</div>
-                <div className="stat-content">
-                  <h3>{stats.totalParents}</h3>
-                  <p>Total Parents</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="quick-actions-section">
-              <h2>Quick Actions</h2>
-              <div className="actions-grid">
-                <button className="action-card" onClick={() => handleTabChange('trips')}>
-                  <div className="action-icon">➕</div>
-                  <h3>Create Trip</h3>
-                  <p>Schedule a new bus trip</p>
-                </button>
-
-                <button className="action-card" onClick={() => handleTabChange('passengers')}>
-                  <div className="action-icon">👤</div>
-                  <h3>Manage Passengers</h3>
-                  <p>View and update passenger info</p>
-                </button>
-
-                <button className="action-card" onClick={() => handleTabChange('reports')}>
-                  <div className="action-icon">📊</div>
-                  <h3>View Reports</h3>
-                  <p>Check trip performance</p>
-                </button>
-
-                <button className="action-card" onClick={navigateToProfileSettings}>
-                  <div className="action-icon">⚙️</div>
-                  <h3>Settings</h3>
-                  <p>Update your profile</p>
-                </button>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="recent-activity-section">
-              <h2>Recent Activity</h2>
-              <div className="activity-list">
-                <div className="activity-item">
-                  <div className="activity-icon">🚌</div>
-                  <div className="activity-content">
-                    <p><strong>Trip #1234</strong> started on time</p>
-                    <span className="activity-time">2 hours ago</span>
-                  </div>
-                </div>
-                <div className="activity-item">
-                  <div className="activity-icon">👤</div>
-                  <div className="activity-content">
-                    <p>New passenger registered: <strong>John Doe</strong></p>
-                    <span className="activity-time">4 hours ago</span>
-                  </div>
-                </div>
-                <div className="activity-item">
-                  <div className="activity-icon">✅</div>
-                  <div className="activity-content">
-                    <p><strong>Trip #1229</strong> completed successfully</p>
-                    <span className="activity-time">6 hours ago</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Trips Tab */}
-        {activeTab === 'trips' && (
-          <div className="tab-content trips-tab">
-            <div className="tab-header">
-              <h1>Trip Management</h1>
-              <button className="btn-primary">+ Create New Trip</button>
-            </div>
-
-            <div className="trips-overview">
-              <div className="overview-cards">
-                <div className="overview-card">
-                  <h3>Today's Trips</h3>
-                  <p className="overview-number">8</p>
-                </div>
-                <div className="overview-card">
-                  <h3>Completed</h3>
-                  <p className="overview-number">5</p>
-                </div>
-                <div className="overview-card">
-                  <h3>Pending</h3>
-                  <p className="overview-number">3</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="trips-list">
-              <h2>Active Trips</h2>
-              <div className="trip-cards">
-                <div className="trip-card">
-                  <div className="trip-header">
-                    <h3>Trip #1234</h3>
-                    <span className="trip-status active">Active</span>
-                  </div>
-                  <div className="trip-details">
-                    <p><strong>Route:</strong> Colombo → Kandy</p>
-                    <p><strong>Time:</strong> 08:00 AM - 12:00 PM</p>
-                    <p><strong>Passengers:</strong> 45/50</p>
-                  </div>
-                  <div className="trip-actions">
-                    <button className="btn-secondary">View Details</button>
-                    <button className="btn-primary">Update Status</button>
-                  </div>
-                </div>
-
-                <div className="trip-card">
-                  <div className="trip-header">
-                    <h3>Trip #1235</h3>
-                    <span className="trip-status scheduled">Scheduled</span>
-                  </div>
-                  <div className="trip-details">
-                    <p><strong>Route:</strong> Colombo → Galle</p>
-                    <p><strong>Time:</strong> 02:00 PM - 06:00 PM</p>
-                    <p><strong>Passengers:</strong> 32/50</p>
-                  </div>
-                  <div className="trip-actions">
-                    <button className="btn-secondary">View Details</button>
-                    <button className="btn-primary">Start Trip</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Passengers Tab */}
-        {activeTab === 'passengers' && (
-          <div className="tab-content passengers-tab">
-            <div className="tab-header">
-              <h1>Passenger Management</h1>
-              <button className="btn-primary">+ Add Passenger</button>
-            </div>
-
-            <div className="passengers-overview">
-              <div className="overview-cards">
-                <div className="overview-card">
-                  <h3>Total Children</h3>
-                  <p className="overview-number">{stats.totalChildren}</p>
-                </div>
-                <div className="overview-card">
-                  <h3>Total Parents</h3>
-                  <p className="overview-number">{stats.totalParents}</p>
-                </div>
-                <div className="overview-card">
-                  <h3>Active Today</h3>
-                  <p className="overview-number">23</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="passengers-list">
-              <h2>Recent Passengers</h2>
-              <div className="passenger-cards">
-                <div className="passenger-card">
-                  <div className="passenger-avatar">👦</div>
-                  <div className="passenger-info">
-                    <h3>John Doe</h3>
-                    <p>Age: 8 | Grade: 3</p>
-                    <p>Parent: Jane Doe</p>
-                  </div>
-                  <div className="passenger-status">
-                    <span className="status-badge active">Active</span>
-                  </div>
-                </div>
-
-                <div className="passenger-card">
-                  <div className="passenger-avatar">👧</div>
-                  <div className="passenger-info">
-                    <h3>Sarah Smith</h3>
-                    <p>Age: 10 | Grade: 5</p>
-                    <p>Parent: Mike Smith</p>
-                  </div>
-                  <div className="passenger-status">
-                    <span className="status-badge active">Active</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Reports Tab */}
-        {activeTab === 'reports' && (
-          <div className="tab-content reports-tab">
-            <div className="tab-header">
-              <h1>Reports & Analytics</h1>
-              <button className="btn-secondary">📥 Export Report</button>
-            </div>
-
-            <div className="reports-overview">
-              <div className="overview-cards">
-                <div className="overview-card">
-                  <h3>This Week</h3>
-                  <p className="overview-number">67</p>
-                  <span className="overview-label">Trips Completed</span>
-                </div>
-                <div className="overview-card">
-                  <h3>On Time</h3>
-                  <p className="overview-number">94%</p>
-                  <span className="overview-label">Performance Rate</span>
-                </div>
-                <div className="overview-card">
-                  <h3>Avg. Passengers</h3>
-                  <p className="overview-number">42</p>
-                  <span className="overview-label">Per Trip</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="reports-charts">
-              <h2>Performance Overview</h2>
-              <div className="chart-placeholder">
-                <div className="chart-icon">📊</div>
-                <p>Interactive charts and analytics will be displayed here</p>
-                <p>Showing trip performance, passenger trends, and system metrics</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Settings Tab */}
-        {activeTab === 'settings' && (
-          <div className="tab-content settings-tab">
-            <div className="tab-header">
-              <h1>Dashboard Preferences</h1>
-            </div>
-
-            <div className="settings-section">
-              <h2>Notification Settings</h2>
-              <div className="setting-item">
-                <label className="setting-label">
-                  <input type="checkbox" defaultChecked />
-                  Email notifications for trip updates
-                </label>
-              </div>
-              <div className="setting-item">
-                <label className="setting-label">
-                  <input type="checkbox" defaultChecked />
-                  SMS alerts for urgent issues
-                </label>
-              </div>
-            </div>
-
-            <div className="settings-section">
-              <h2>Display Preferences</h2>
-              <div className="setting-item">
-                <label className="setting-label">
-                  <input type="checkbox" defaultChecked />
-                  Show passenger photos
-                </label>
-              </div>
-              <div className="setting-item">
-                <label className="setting-label">
-                  <input type="checkbox" />
-                  Dark mode (coming soon)
-                </label>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Help Tab */}
-        {activeTab === 'help' && (
-          <div className="tab-content help-tab">
-            <div className="tab-header">
-              <h1>Help & Support</h1>
-            </div>
-
-            <div className="help-section">
-              <h2>Quick Start Guide</h2>
-              <div className="help-item">
-                <h3>🚀 Getting Started</h3>
-                <p>Use the navigation tabs to switch between different sections of your dashboard.</p>
-              </div>
-              <div className="help-item">
-                <h3>🚌 Managing Trips</h3>
-                <p>Go to the Trips tab to view, create, and update trip information.</p>
-              </div>
-              <div className="help-item">
-                <h3>👥 Passenger Management</h3>
-                <p>Use the Passengers tab to view and manage passenger information.</p>
-              </div>
-            </div>
-
-            <div className="help-section">
-              <h2>Contact Support</h2>
-              <p>If you need assistance, please contact:</p>
-              <div className="contact-info">
-                <p><strong>Email:</strong> support@safego.com</p>
-                <p><strong>Phone:</strong> +94 11 123 4567</p>
-                <p><strong>Hours:</strong> Mon-Fri 8:00 AM - 6:00 PM</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+        </motion.main>
+      </AnimatePresence>
     </div>
   );
 };

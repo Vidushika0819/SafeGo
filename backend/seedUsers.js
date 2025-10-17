@@ -3,6 +3,7 @@ const User = require('./Models/User');
 const Driver = require('./Models/DriverModel');
 const Coordinator = require('./Models/CoordinatorModel');
 const Parent = require('./Models/ParentModel');
+const Child = require('./Models/Child');
 
 const seedUsers = async () => {
   try {
@@ -86,6 +87,8 @@ const seedUsers = async () => {
         await parentProfile.save();
         user.profile = parentProfile._id;
         await user.save();
+
+        // Removed sample children creation
       }
 
       console.log(`Created sample user: ${userData.email} (${userData.role})`);

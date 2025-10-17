@@ -7,11 +7,12 @@ const {
   updateChild,
   deactivateChild,
   reactivateChild,
-  getChildStats
+  getChildStats,
+  getChildrenForCoordinator
 } = require('../Controllers/childController');
 
 // Import authentication middleware
-const { authenticateToken } = require('./authRoutes');
+const { authenticateToken, requireRole } = require('./authRoutes');
 
 // All child routes require authentication
 router.use(authenticateToken);
@@ -36,5 +37,8 @@ router.delete('/:id', deactivateChild);
 
 // PATCH /api/children/:id/reactivate - Reactivate a child
 router.patch('/:id/reactivate', reactivateChild);
+
+// GET /api/children/coordinator/list - Get all children for coordinator
+router.get('/coordinator/list', authenticateToken, requireRole('coordinator'), getChildrenForCoordinator);
 
 module.exports = router;

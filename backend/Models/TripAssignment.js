@@ -73,6 +73,23 @@ const tripAssignmentSchema = new Schema({
       type: String,
       maxlength: 50
     }
+  },
+
+  // Check-in/checkout tracking for student safety
+  checkinStatus: {
+    type: String,
+    enum: ['pending', 'checked_in', 'dropped_off'],
+    default: 'pending'
+  },
+
+  checkinTimestamp: {
+    type: Date,
+    default: null
+  },
+
+  checkoutTimestamp: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
@@ -82,6 +99,10 @@ const tripAssignmentSchema = new Schema({
 tripAssignmentSchema.index({ child: 1, trip: 1, assignmentType: 1 }, { unique: true });
 tripAssignmentSchema.index({ trip: 1, status: 1 });
 tripAssignmentSchema.index({ child: 1, status: 1 });
+
+// Check-in/checkout tracking indexes
+tripAssignmentSchema.index({ trip: 1, checkinStatus: 1 });
+tripAssignmentSchema.index({ child: 1, trip: 1 });
 
 // Pre-save middleware to update lastModified
 tripAssignmentSchema.pre('save', function(next) {

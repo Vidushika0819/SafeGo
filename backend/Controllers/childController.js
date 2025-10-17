@@ -336,6 +336,26 @@ const getChildStats = async (req, res) => {
   }
 };
 
+const getChildrenForCoordinator = async (req, res) => {
+  try {
+    const children = await Child.find()
+      .populate('parent', 'email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: children,
+      count: children.length
+    });
+  } catch (error) {
+    console.error('Error fetching children for coordinator:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching children'
+    });
+  }
+};
+
 module.exports = {
   getChildren,
   getChild,
@@ -343,5 +363,6 @@ module.exports = {
   updateChild,
   deactivateChild,
   reactivateChild,
-  getChildStats
+  getChildStats,
+  getChildrenForCoordinator
 };

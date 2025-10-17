@@ -1,4 +1,5 @@
 const Coordinator = require('../Models/CoordinatorModel');
+const Child = require('../Models/Child');
 
 //data display
 const getAllCoordinators = async (req, res, next) => {
@@ -214,6 +215,147 @@ const updateCoordinatorProfile = async (req, res) => {
     }
 };
 
+// Get all children for coordinators to view (coordinator access only)
+const getAllChildren = async (req, res) => {
+    try {
+        // Verify the user is a coordinator (middleware should handle this, but double check)
+        if (req.user.role.toLowerCase() !== 'coordinator') {
+            return res.status(403).json({
+                success: false,
+                message: 'Access denied. Coordinator role required.'
+            });
+        }
+
+        const children = await Child.find({})
+            .sort({ createdAt: -1 })
+            .populate('parent', 'email name phoneNumber');
+
+        res.status(200).json({
+            success: true,
+            data: children,
+            count: children.length
+        });
+    } catch (error) {
+        console.error('Error fetching all children for coordinator:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching children',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+// Get child statistics for coordinators
+const getCoordinatorChildStats = async (req, res) => {
+    try {
+        console.log('getCoordinatorChildStats called by user:', req.user); // Debug log
+
+        const stats = await Child.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: 1 },
+                    active: {
+                        $sum: {
+                            $cond: [
+                                { $and: [{ $eq: ['$status', 'active'] }, { $eq: ['$isActive', true] }] },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+                    inactive: {
+                        $sum: {
+                            $cond: [
+                                { $or: [{ $eq: ['$status', 'inactive'] }, { $eq: ['$isActive', false] }] },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+                    byGrade: {
+                        $push: '$grade'
+                    },
+                    byAge: {
+                        $push: '$age'
+                    }
+                }
+            }
+        ]);
+
+        const result = stats[0] || { total: 0, active: 0, inactive: 0, byGrade: [], byAge: [] };
+
+        // Count grades
+        const gradeCount = result.byGrade.reduce((acc, grade) => {
+            acc[grade] = (acc[grade] || 0) + 1;
+            return acc;
+        }, {});
+
+        // Count ages
+        const ageCount = result.byAge.reduce((acc, age) => {
+            acc[age] = (acc[age] || 0) + 1;
+            return acc;
+        }, {});
+
+        res.status(200).json({
+            success: true,
+            data: {
+                total: result.total,
+                active: result.active,
+                inactive: result.inactive,
+                grades: gradeCount,
+                ages: ageCount
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching child stats for coordinator:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching child statistics',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+// Get students assigned to a specific trip for check-in/check-out operations
+const getStudentsForCheckin = async (req, res) => {
+  try {
+    const { tripId } = req.query;
+
+    if (!tripId) {
+      return res.status(400).json({ success: false, message: 'Trip ID required' });
+    }
+
+    const TripAssignment = require('../Models/TripAssignment');
+
+    const assignments = await TripAssignment.find({ 
+      trip: tripId, 
+      status: 'active' 
+    })
+    .populate({
+      path: 'child',
+      select: 'firstName lastName grade emergencyContacts',
+      populate: {
+        path: 'emergencyContacts.name emergencyContacts.phone emergencyContacts.email',
+        select: 'name phone email isPrimary'
+      }
+    })
+    .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: assignments,
+      count: assignments.length
+    });
+  } catch (error) {
+    console.error('Error fetching students for check-in:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching students'
+    });
+  }
+};
+
 module.exports = {
     getAllCoordinators,
     addCoordinators,
@@ -221,5 +363,8 @@ module.exports = {
     updateCoordinator,
     deleteCoordinator,
     getCoordinatorProfile,
-    updateCoordinatorProfile
+    updateCoordinatorProfile,
+    getAllChildren,
+    getCoordinatorChildStats,
+    getStudentsForCheckin
 };
