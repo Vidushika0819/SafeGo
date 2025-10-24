@@ -5,6 +5,8 @@
     "@tailwindcss/typography": "^0.5.19",
     "autoprefixer": "^10.4.21",
     "framer-motion": "^10.18.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.3",
     "lucide-react": "^0.545.0",
     "nodemailer": "^7.0.9",
     "postcss": "^8.5.6",

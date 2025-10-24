@@ -33,6 +33,7 @@ const AdminDashboard = () => {
   const [searchParams] = useSearchParams();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showHero, setShowHero] = useState(true);
 
   useEffect(() => {
     // Verify admin role on component mount
@@ -47,13 +48,23 @@ const AdminDashboard = () => {
     const section = searchParams.get('section');
     if (section && ['dashboard', 'users', 'trips', 'buses', 'reports', 'finance', 'seats', 'settings', 'logs', 'backup', 'system'].includes(section)) {
       setActiveTab(section);
+      setShowHero(false); // Hide hero if we start with a specific section
     }
   }, [isAdmin, searchParams]);
 
   const handleTabChange = (tabName) => {
+    // If changing to dashboard, show hero
+    if (tabName === 'dashboard') {
+      setShowHero(true);
+    } else if (showHero) {
+      setShowHero(false);
+    }
+
     // Smooth scroll to top when changing tabs (except finance/seats which redirect externally)
     if (tabName !== 'finance' && tabName !== 'seats') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 300); // Wait for transition animation
     }
     setActiveTab(tabName);
   };
@@ -107,195 +118,206 @@ const AdminDashboard = () => {
       <div className="pt-16"></div>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 lg:pt-20 lg:pb-28 overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, 0],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="absolute top-20 right-20 w-32 h-32 bg-white/10 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{
-              scale: [1.1, 1, 1.1],
-              rotate: [0, -5, 0],
-            }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="absolute bottom-20 left-20 w-24 h-24 bg-white/5 rounded-full blur-xl"
-          />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[60vh]">
-            {/* Hero Content */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-8"
-            >
+      <AnimatePresence>
+        {showHero && (
+          <motion.section
+            key="hero"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0, scale: 0.98 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="relative pt-16 pb-20 lg:pt-20 lg:pb-28 overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800"
+          >
+            {/* Animated background elements */}
+            <div className="absolute inset-0 overflow-hidden">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                <div className="flex items-center space-x-2 mb-4">
-                  <Shield className="w-8 h-8 text-white" />
-                  <span className="text-xl font-semibold text-white/90">Admin Portal</span>
-                </div>
-                <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight">
-                  Welcome back,
-                  <span className="block text-3xl lg:text-5xl mt-2 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                    {getUserDisplayName()}! 👋
-                  </span>
-                </h1>
-              </motion.div>
-
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-xl lg:text-2xl text-white/90 max-w-lg leading-relaxed"
-              >
-                Your comprehensive system administration dashboard. Monitor, manage, and optimize your transportation network.
-              </motion.p>
-
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, 0],
+                }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="absolute top-20 right-20 w-32 h-32 bg-white/10 rounded-full blur-xl"
+              />
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="flex flex-col sm:flex-row gap-4"
-              >
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleTabChange('dashboard')}
-                  className="group flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all duration-300"
-                >
-                  <LayoutDashboard className="w-5 h-5 mr-2" />
-                  Dashboard
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleTabChange('users')}
-                  className="group flex items-center justify-center px-8 py-4 bg-blue-800/30 text-white rounded-xl font-semibold text-lg hover:bg-blue-800/50 transition-all duration-300 border border-white/20"
-                >
-                  <Users className="w-5 h-5 mr-2" />
-                  Manage Users
-                </motion.button>
-              </motion.div>
-            </motion.div>
+                animate={{
+                  scale: [1.1, 1, 1.1],
+                  rotate: [0, -5, 0],
+                }}
+                transition={{
+                  duration: 25,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="absolute bottom-20 left-20 w-24 h-24 bg-white/5 rounded-full blur-xl"
+              />
+            </div>
 
-            {/* Hero Visual */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-            >
-              <div className="relative">
-                {/* Animated dashboard preview */}
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[60vh]">
+                {/* Hero Content */}
                 <motion.div
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl"
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="space-y-8"
                 >
-                  <div className="flex items-center space-x-3 mb-6">
-                    <Shield className="w-12 h-12 text-white" />
-                    <div>
-                      <h3 className="text-2xl font-bold text-white">SafeGo Admin</h3>
-                      <p className="text-white/80">Management Portal</p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                  >
+                    <div className="flex items-center space-x-2 mb-4">
+                      <Shield className="w-8 h-8 text-white" />
+                      <span className="text-xl font-semibold text-white/90">Admin Portal</span>
                     </div>
-                  </div>
+                    <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight">
+                      Welcome back,
+                      <span className="block text-3xl lg:text-5xl mt-2 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                        {getUserDisplayName()}! 👋
+                      </span>
+                    </h1>
+                  </motion.div>
 
-                  {/* Mock stats */}
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-white/20 rounded-xl p-4">
-                      <div className="text-2xl font-bold text-white mb-1">247</div>
-                      <div className="text-sm text-white/80">Active Users</div>
-                    </div>
-                    <div className="bg-white/20 rounded-xl p-4">
-                      <div className="text-2xl font-bold text-white mb-1">89</div>
-                      <div className="text-sm text-white/80">Live Trips</div>
-                    </div>
-                  </div>
+                  <motion.p
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    className="text-xl lg:text-2xl text-white/90 max-w-lg leading-relaxed"
+                  >
+                    Your comprehensive system administration dashboard. Monitor, manage, and optimize your transportation network.
+                  </motion.p>
 
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    className="flex flex-col sm:flex-row gap-4"
+                  >
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleTabChange('dashboard')}
+                      className="group flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all duration-300"
+                    >
+                      <LayoutDashboard className="w-5 h-5 mr-2" />
+                      Dashboard
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleTabChange('users')}
+                      className="group flex items-center justify-center px-8 py-4 bg-blue-800/30 text-white rounded-xl font-semibold text-lg hover:bg-blue-800/50 transition-all duration-300 border border-white/20"
+                    >
+                      <Users className="w-5 h-5 mr-2" />
+                      Manage Users
+                    </motion.button>
+                  </motion.div>
                 </motion.div>
 
-                {/* Floating elements */}
+                {/* Hero Visual */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, delay: 0.8 }}
-                  className="absolute top-10 -left-10 bg-white rounded-xl p-4 shadow-xl"
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative"
                 >
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-5 h-5 text-yellow-500" />
-                    <div>
-                      <div className="font-semibold text-gray-900">Performance</div>
-                      <div className="text-sm text-gray-600">94% On-Time</div>
-                    </div>
-                  </div>
-                </motion.div>
+                  <div className="relative">
+                    {/* Animated dashboard preview */}
+                    <motion.div
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl"
+                    >
+                      <div className="flex items-center space-x-3 mb-6">
+                        <Shield className="w-12 h-12 text-white" />
+                        <div>
+                          <h3 className="text-2xl font-bold text-white">SafeGo Admin</h3>
+                          <p className="text-white/80">Management Portal</p>
+                        </div>
+                      </div>
 
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, delay: 1.0 }}
-                  className="absolute bottom-10 -right-6 bg-white rounded-xl p-4 shadow-xl"
-                >
-                  <div className="flex items-center space-x-2">
-                    <Target className="w-5 h-5 text-blue-500" />
-                    <div>
-                      <div className="font-semibold text-gray-900">Efficiency</div>
-                      <div className="text-sm text-gray-600">32% Improved</div>
-                    </div>
+                      {/* Mock stats */}
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="bg-white/20 rounded-xl p-4">
+                          <div className="text-2xl font-bold text-white mb-1">247</div>
+                          <div className="text-sm text-white/80">Active Users</div>
+                        </div>
+                        <div className="bg-white/20 rounded-xl p-4">
+                          <div className="text-2xl font-bold text-white mb-1">89</div>
+                          <div className="text-sm text-white/80">Live Trips</div>
+                        </div>
+                      </div>
+
+                      <div className="flex space-x-2">
+                        <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                        <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                        <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                      </div>
+                    </motion.div>
+
+                    {/* Floating elements */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.8, delay: 0.8 }}
+                      className="absolute top-10 -left-10 bg-white rounded-xl p-4 shadow-xl"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Star className="w-5 h-5 text-yellow-500" />
+                        <div>
+                          <div className="font-semibold text-gray-900">Performance</div>
+                          <div className="text-sm text-gray-600">94% On-Time</div>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.8, delay: 1.0 }}
+                      className="absolute bottom-10 -right-6 bg-white rounded-xl p-4 shadow-xl"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Target className="w-5 h-5 text-blue-500" />
+                        <div>
+                          <div className="font-semibold text-gray-900">Efficiency</div>
+                          <div className="text-sm text-gray-600">32% Improved</div>
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
                 </motion.div>
               </div>
-            </motion.div>
-          </div>
 
-          {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.5 }}
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
-            onClick={() => handleTabChange('dashboard')}
-          >
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="flex flex-col items-center text-white/70"
-            >
-              <span className="text-sm mb-2">Explore Dashboard</span>
-              <ChevronDown className="w-6 h-6" />
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
+              {/* Scroll indicator */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1.5 }}
+                className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
+                onClick={() => handleTabChange('dashboard')}
+              >
+                <motion.div
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="flex flex-col items-center text-white/70"
+                >
+                  <span className="text-sm mb-2">Explore Dashboard</span>
+                  <ChevronDown className="w-6 h-6" />
+                </motion.div>
+              </motion.div>
+            </div>
+          </motion.section>
+        )}
+      </AnimatePresence>
 
       {/* Modern Dashboard Content */}
       <div className="tab-content-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

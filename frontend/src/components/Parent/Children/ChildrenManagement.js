@@ -5,7 +5,7 @@ import ParentNavbar from '../ParentNavbar';
 import { Button } from '../../ui/button';
 import { Plus, Users, Search, Filter } from 'lucide-react';
 import ChildList from './ChildList';
-import ChildForm from './ChildForm';
+import ChildFormModern from './ChildFormModern';
 
 const ChildrenManagement = () => {
   const { user } = useAuth();
@@ -164,7 +164,7 @@ const ChildrenManagement = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <ChildForm
+                <ChildFormModern
                   child={editingChild}
                   onSave={handleSaveChild}
                   onCancel={handleCancelForm}
